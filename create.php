@@ -70,7 +70,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['bandname'] !="")
                                 <td><strong><input name="bandname" type="text" maxlength="8"></strong></td>       
                             </tr>
                              <tr>
-                                <td width="200"><strong>Descritbtion:</strong></td>
+                                <td width="200"><strong>Description:</strong></td>
                                 <td><strong><input name="de" type="text" maxlength="300"></strong></td>       
                             </tr>
                             <tr>

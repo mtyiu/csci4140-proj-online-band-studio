@@ -3,10 +3,10 @@
 
 header("Content-type: text/plain");
 
-$dbhost = '137.189.89.74';
-$dbuser = '1155000538';
-$dbpass = 'A4LgOmdJ';
-$dbname = '1155000538';
+$dbhost = '127.0.0.1';
+$dbuser = 'root';
+$dbpass = 'csciband';
+$dbname = 'prjband';
 try {
      
     $dbh = new PDO("mysql:host=$dbhost;dbname=$dbname",$dbuser, $dbpass);// open a mysql database connection
