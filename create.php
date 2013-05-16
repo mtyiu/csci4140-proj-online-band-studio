@@ -17,7 +17,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['bandname'] !="")
     
     if($result){
         //can go brand room directly
-        header("location: welcome.php");
+        header("location: admin.php");
     }
     
 } 
@@ -52,7 +52,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['bandname'] !="")
                     </p>  
                 </div>               
                 <div class="content">
-                    <form name="form2" method="post">
+                    <form name="form2" action="client.php" method="post">
                         <table width="600" border="0"  cellspacing="4" bgcolor="#D2C2E0">
                             
                             <?php
