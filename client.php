@@ -210,25 +210,28 @@
             <tr>
                 <td style="width: 50%; height: 20%; border: 1px solid;">
                     <div id="song_info">
-                        <form action="admin.php" method="post" >
+                        <form action="client.php" method="post" >
                             <h3><font color="white">Song Information</font></h3>
 							<?php							
 								$conn = connect();
 								
 								mysql_select_db("prjband", $conn);
 								
-								$result = mysql_query("SELECT * FROM band WHERE admin = '$login_session'");
+								$result = mysql_query("SELECT * FROM band WHERE player1='$login_session' OR player2='$login_session' OR player3='$login_session'");
 								$row = mysql_fetch_array($result);
 								
 								$room_name = $row[name];
+								echo "<script type=text/javascript>console.log('$login_session');</script>";
 								
 								$result = mysql_query("SELECT * FROM music_info WHERE band_name = '$room_name'");
 								$row = mysql_fetch_array($result);
 								
-								$song_name = $row[song_name];
-								$author = $row[author];
-								$tempo = $row[tempo];
-								$key = $row[song_key];
+								$song_name = $row["song_name"];
+								$author = $row["author"];
+								$tempo = $row["tempo"];
+								$key = $row["song_key"];
+								
+								echo "<script type=text/javascript>console.log('$song_name');</script>";
 							
 								disconnect($conn);
 							
