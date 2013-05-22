@@ -1,7 +1,11 @@
 var connection;
 var sessionID;
+var localMediaStream;
 
-function adminInitAudio( currentSessionID ) {
+function initAudio( currentSessionID ) {
+	console.log( "initAudio" );
+	sessionID = currentSessionID;
+	location.hash = "#" + sessionID;
 	connection = new RTCMultiConnection();
 	connection.session = 'only-audio';
 	connection.onstream = function (stream) {
@@ -13,22 +17,35 @@ function adminInitAudio( currentSessionID ) {
 				remoteMediaStreams.insertBefore(mediaElement, remoteMediaStreams.firstChild);
 			} else
 				document.getElementById('local-media-stream').appendChild(mediaElement);
+			
 			mediaElement.controls = true;
-		}
 
+			var loadingRemoteElement = document.getElementById('loading_remote');
+			loadingRemoteElement.style.display = "none";
+
+		} 
+		
 		if (stream.type === 'local') {
+			localMediaStream = stream;
 			mediaElement = stream.mediaElement;
 			document.getElementById('local-media-stream').appendChild(mediaElement);
 			mediaElement.controls = true;
+			
+			var loadingLocalElement = document.getElementById('loading_local');
+			loadingLocalElement.style.display = "none";
+
 		}
 	};
-	sessionID = currentSessionID;
 }
 
 function openSession() {
-	connection.open(sessionID);
+	console.log( "openSession" );
+    var sessionid = location.hash.replace('#', '');
+	connection.open(sessionid);
 };
 
 function joinSession() {
-	connection.connect(sessionID);
+	console.log( "joinSession" );
+    var sessionid = location.hash.replace('#', '');
+	connection.connect(sessionid);
 };

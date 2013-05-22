@@ -139,14 +139,14 @@
                             remoteMediaStreams.insertBefore(mediaElement, remoteMediaStreams.firstChild);
                         } else //document.getElementById('local-media-stream').innerHTML="Active";
 						document.getElementById('local-media-stream').appendChild(mediaElement);
-                        mediaElement.controls = false;
+                        mediaElement.controls = true;
                     }
 
                     if (stream.type === 'local') {
                         mediaElement = stream.mediaElement;
 						//document.getElementById('local-media-stream').innerHTML="Me";
                         document.getElementById('local-media-stream').appendChild(mediaElement);
-                        mediaElement.controls = false;
+                        mediaElement.controls = true;
                     }
                 };
 

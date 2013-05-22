@@ -8,6 +8,7 @@
     <script type="text/javascript" src="chatbox.js"></script>
     <script type="text/javascript" src="firebase.js"></script>
     <script type="text/javascript" src="RTCMultiConnection-v1.2.js"></script>
+    <script type="text/javascript" src="recorder.js"></script>
     <script type="text/javascript" src="webaudio.js"></script>
     <script type="text/javascript">
         var i=0;
@@ -413,7 +414,10 @@
 						
 						disconnect($conn);
 					?>
+					<p id="loading_local">Loading local media stream...</p>
 					<section id="local-media-stream"></section>
+					
+					<p id="loading_remote">Loading remote media stream...</p>
 					<section id="remote-media-streams"></section>
 					<script type="text/javascript">
 						<?php
@@ -425,7 +429,7 @@
 							disconnect($conn);
 							echo "var band_id = $band_id;\n";
 						?>
-						adminInitAudio(band_id);
+						initAudio(band_id);
 						openSession();
 					</script>
 					<input type="submit" value="Set" />

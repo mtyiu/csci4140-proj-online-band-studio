@@ -8,6 +8,7 @@
     <script type="text/javascript" src="chatbox.js"></script>
     <script type="text/javascript" src="firebase.js"></script>
     <script type="text/javascript" src="RTCMultiConnection-v1.2.js"></script>
+    <script type="text/javascript" src="recorder.js"></script>
     <script type="text/javascript" src="webaudio.js"></script>
     <script type="text/javascript">
         var i=0;
@@ -169,7 +170,6 @@
 							
 							$prev_exten = $file_parts['extension'];
 							$i++;
-							echo "<script>console.log('$i');</script>";
 						}
 						
 						if($check == 1){
@@ -225,7 +225,6 @@
 								$row = mysql_fetch_array($result);
 								
 								$room_name = $row[name];
-								echo "<script type=text/javascript>console.log('$login_session');</script>";
 								
 								$result = mysql_query("SELECT * FROM music_info WHERE band_name = '$room_name'");
 								$row = mysql_fetch_array($result);
@@ -235,8 +234,6 @@
 								$tempo = $row["tempo"];
 								$key = $row["song_key"];
 								
-								echo "<script type=text/javascript>console.log('$song_name');</script>";
-							
 								disconnect($conn);
 							
 								echo "<font color='white'>Name  : </font><input type='text' id='song_name' name='song_name' value='$song_name' disabled />";
@@ -297,7 +294,7 @@
 						}else{
 							$vis = "hidden";
 						}
-						echo "<img id='left' align='right' name='0' src='$path0' style='visibility: $vis;' />";
+						echo "<img id='left' align='right' name='0' style='visibility: $vis;' />";
 						
 						disconnect($conn);
 					?>
@@ -308,7 +305,16 @@
 					<?php
 						echo "<div id='sheet2' name=$exten>";
 						
-						echo "<img id='right' name='1' src='$path1' style='visibility: $vis;' />";
+						echo "<img id='right' name='1' style='visibility: $vis;' />";
+						
+						echo "<script type='text/javascript'>\n";
+						echo "	if (uploaded) {\n";
+						echo "		var ms0Element = document.getElementById('left');\n";
+						echo "		var ms1Element = document.getElementById('right');\n";
+						echo "		ms0Element.src = '$path0';\n";
+						echo "		ms1Element.src = '$path1';\n";
+						echo "	}\n";
+						echo "</script>\n";
 					?>
                     </div>
                 </td>
@@ -379,8 +385,24 @@
 						disconnect($conn);
 					?>
 					<input type="submit" value="Set" />
+					<p id="loading_local">Loading local media stream...</p>
 					<section id="local-media-stream"></section>
+
+					<p id="loading_remote">Loading remote media stream...</p>
 					<section id="remote-media-streams"></section>
+					<script type="text/javascript">
+						<?php
+							$conn = connect();					
+							mysql_select_db("prjband", $conn);
+							$result = mysql_query("SELECT * FROM band WHERE player1='$login_session' OR player2='$login_session' OR player3='$login_session'");
+							$row = mysql_fetch_array($result);								
+							$band_id = $row["band_id"];
+							disconnect($conn);
+							echo "var band_id = $band_id;\n";
+						?>
+						initAudio(band_id);
+						joinSession();
+					</script>
 					</form>
 					<input type='button' id="record" value='Record' onclick="start_record();" />
                     </div>
