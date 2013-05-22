@@ -1,7 +1,7 @@
 <html>
     <head>
         <title>Bandroom Admin</title>
-        <link rel="stylesheet" type="text/css" href="stylesheet.css">
+        <link rel="stylesheet" type="text/css" href="414.css">
     </head>
     
     <script type="text/javascript" src="ajax.js"></script>
@@ -56,12 +56,40 @@
             }
             
         }, 1000);
+		
+		function start_record(){
+			if(record == 0){
+				record = 1;
+				document.getElementById("record").value = "Stop";
+			}else{
+				var img1 = document.getElementById("left");
+				var img2 = document.getElementById("right");
+				var user = document.getElementById("sheet1").attributes["name"].value;
+				var exten = document.getElementById("sheet2").attributes["name"].value;
+			
+				record = 0;
+				sec = 0;
+				finish = 0;
+				i = 0;
+				document.getElementById("record").value = "Record";
+
+				var path = "image/" + user + "/" + 0 + "." + exten;
+				img1.src = path;
+				img1.name = "0";
+				
+				var path = "image/" + user + "/" + 1 + "." + exten;
+				img2.src = path;
+				img2.name = "1";
+			}
+			
+			return false;
+		}
         
     </script>
     
-    <body onbeforeunload="signInForm.signInButt.name='signOut';signInOut()" onload="hideShow('hide')">
+    <body onload="signInOut();">
 		<?php
-			$login_session = "wendy";
+			include('lock.php');
 			function connect(){
 				$conn = mysql_connect("localhost", "root", "csciband");
 				if(!$conn)
@@ -183,10 +211,8 @@
                 <td style="width: 50%; height: 20%; border: 1px solid;">
                     <div id="song_info">
                         <form action="admin.php" method="post" >
-                            <h3>Song Information</h3>
-							<?php
-								//include('lock.php');
-							
+                            <h3><font color="white">Song Information</font></h3>
+							<?php							
 								$conn = connect();
 								
 								mysql_select_db("prjband", $conn);
@@ -234,10 +260,10 @@
 							
 								disconnect($conn);
 							
-								echo "Name  : <input type='text' id='song_name' name='song_name' value='$song_name' />";
-								echo "Author: <input type='text' id='author' name='author' value='$author' /><br />";
-								echo "Tempo : <input type='text' id='tempo' name='tempo' value='$tempo' />";
-								echo "Key   : <input type='text' id='key' name='key' value='$key' /><br />";
+								echo "<font color='white'>Name  : </font><input type='text' id='song_name' name='song_name' value='$song_name' />";
+								echo "<font color='white'>Author: </font><input type='text' id='author' name='author' value='$author' /><br />";
+								echo "<font color='white'>Tempo : </font><input type='text' id='tempo' name='tempo' value='$tempo' />";
+								echo "<font color='white'>Key   : </font><input type='text' id='key' name='key' value='$key' /><br />";
 							?>
                             <input type="submit" value="Set" />
                         </form>
@@ -258,9 +284,9 @@
 					disconnect($conn);
 					?>
                         <form enctype="multipart/form-data" action="admin.php" method="post" >
-                            <h3>Music Sheet Upload</h3>
-                            Choose File (.zip): <input type="file" name="sheet_zip" id="sheet_zip" accept="application/x-zip-compressed" /><br />
-                            <a href="sample.php">Sample File</a><br />
+                            <h3><font color='white'>Music Sheet Upload</font></h3>
+                            <font color='white'>Choose File (.zip): <input type="file" name="sheet_zip" id="sheet_zip" accept="application/x-zip-compressed" /></font><br />
+                            <a href="sample.php" target="_blank"><font color='grey'>Sample File</font></a><br />
                             <input type="submit" value="Upload" />
                         </form>
                     </div>
@@ -313,14 +339,16 @@
                 <td style="width: 50%; border: 1px solid;">
                     <div id="chatroom">
                         <form onsubmit="signInOut();return false" id="signInForm">
-                            <input id="userName" type="text">
-                            <input id="signInButt" name="signIn" type="submit" value="Sign in">
+							<?php
+								echo "<input id='userName' type='text' value='$login_session'>";
+							?>
+                            <input id="signInButt" name="signIn" type="submit" value="Sign In">
                             <span id="signInName">User name</span>
                         </form>
                     
-                        <div id="chatBox"></div>
+                        <div id="chatBox" style="background-color: white;"></div>
                         
-                        <div id="usersOnLine"></div>
+                        <div id="usersOnLine" style="background-color: white;"></div>
                         
                         <form onsubmit="sendMessage();return false" id="messageForm">
                             <input id="message" type="text">
@@ -362,33 +390,19 @@
 						$flip = $row[auto_flip];
 						
 						echo "<div id='config' name=$flip>";
-						echo "<h3>Config</h3>";
+						echo "<h3><font color='white'>Config</font></h3>";
 						
 						echo "<form action='admin.php' method='post' >";
 						
-						echo "Metronome: <input type='text' id='metro' name='metro' value=$metro />";
-						echo "Auto Flip (in second): <input type='text' id='flip' name='flip' value=$flip />";
+						echo "<font color='white'>Metronome: </font><input type='text' id='metro' name='metro' value=$metro />";
+						echo "<font color='white'>Auto Flip (in second): </font><input type='text' id='flip' name='flip' value=$flip />";
 						
 						disconnect($conn);
 					?>
 					<input type="submit" value="Set" />
 					</form>
-					<form action="admin.php" method="post">
-						<a href="mixer.php">Mixer</a>
-						<?php
-							$record = $_POST["record"];
-							
-							if($record == 1){
-								echo "<input type='text' id='record' name='record' value='0' style='visibility: hidden;' />";
-								echo "<script type='text/javascript'>record=1;</script>";
-								echo "<input type='submit' value='Stop' />";
-							}else{
-								echo "<input type='text' id='record' name='record' value='1' style='visibility: hidden;' />";
-								echo "<script type='text/javascript'>record=0;</script>";
-								echo "<input type='submit' value='Record' />";
-							}
-						?>
-					</form>
+					<a href="mixer.php" target="_blank"><font color='grey'>Mixer</font></a>
+					<input type='button' id="record" value='Record' onclick="start_record();" />
                     </div>
                 </td>
             </tr>

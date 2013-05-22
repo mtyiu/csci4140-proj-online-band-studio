@@ -12,7 +12,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['bandname'] !="")
     $no_record = mysql_num_rows($result); 
     $id=$no_record+1;
     // echo "$id, $myband, $login_session, 1";
-    $sql="INSERT INTO $tbl_name (band_id, name, admin,no_player,content) VALUES ('$id', '$myband', '$login_session', 0,'$des')";
+    $sql="INSERT INTO $tbl_name (band_id, name, admin,no_player,content,player1,player2,player3) VALUES ('$id', '$myband', '$login_session', 0,'$des','','','')";
     $result=mysql_query($sql);
     
     if($result){
@@ -52,7 +52,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['bandname'] !="")
                     </p>  
                 </div>               
                 <div class="content">
-                    <form name="form2" action="client.php" method="post">
+                    <form name="form2" action="create.php" method="post">
                         <table width="600" border="0"  cellspacing="4" bgcolor="#D2C2E0">
                             
                             <?php

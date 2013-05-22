@@ -5,11 +5,7 @@ function hideShow(hs){
     document.getElementById("left").style.maxHeight = window.innerHeight * 0.55
     document.getElementById("right").style.maxHeight = window.innerHeight * 0.55
     if(hs=="hide"){
-        signInForm.signInButt.value="Sign in"
-        signInForm.signInButt.name="signIn"
-        messageForm.style.display="none"
-        signInForm.userName.style.display="block"
-        signInName.innerHTML=""
+        window.location.assign("welcome.php")
     }
     if(hs=="show"){
         signInForm.signInButt.value="Sign out"
@@ -77,8 +73,8 @@ function checkSignOut(res){
 // Update info
 function updateInfo(){
     serverRes.innerHTML="Updating"
-    Ajax_Send("POST","users.php","",showUsers)
-    Ajax_Send("POST","receive.php","lastreceived="+lastReceived,showMessages)
+    Ajax_Send("POST","users.php","&user="+signInForm.userName.value,showUsers)
+    Ajax_Send("POST","receive.php","lastreceived="+lastReceived+"&user="+signInForm.userName.value,showMessages)
 }
 
 // update online users

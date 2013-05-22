@@ -62,9 +62,57 @@ function showInfo(ev)
         }
     }
 }
+function join(id){
+     Request.open("POST", "redirect.php", true);
+        
+        Request.setRequestHeader("Content-type",
+                                 "application/x-www-form-urlencoded");
+        
+        var input = "f_name="+id;
+        Request.send(input);
+        Request.onreadystatechange = function () {
+            if(Request.readyState == 4)
+            {
+                if(Request.status != 200)
+                    alert("Error code = " + new String(Request.status));
+                else
+                {   
+                   var ans = Request.responseText;
+                    
+                    if (ans == "1"){
+                        window.location.assign("admin.php");
+                    }
+                    if (ans == "2"){
+                        window.location.assign("client.php");
+                    }
+                    if (ans == "3"){
+                        window.location.assign("client.php");
+                    }
+                    console.log(ans);
+                }
+            }
+        }
+}
 function info(e){
     var target=e-1;
     var pervious = document.getElementById(per);
+    var pic = "jopic"+e;
+    var pic_p = "jopic"+per;
+    var join_pic = document.getElementById(pic_p);
+     
+    join_pic.id = pic;  
+    if(database[target].no_player <4){
+        join_pic.style.visibility="visible";
+    }
+    else{
+        join_pic.style.visibility="hidden";
+    }
+   join_pic.onclick = function(){
+        join(e);
+        console.log("ccc");
+    };
+     console.log( join_pic.onclick );
+    console.log(database[target].band_id);
     console.log("Caa:"+pervious.onclick);
     pervious.className="mainoff";
     pervious.onmouseover=function(){this.className="mainon"};
@@ -84,4 +132,5 @@ function info(e){
      tt.onmouseover=function(){this.className="mainon"};
      tt.onmouseout=function(){this.className="mainon"};
     per=tt.id;
+    
 }
