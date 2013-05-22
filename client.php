@@ -6,6 +6,9 @@
     
     <script type="text/javascript" src="ajax.js"></script>
     <script type="text/javascript" src="chatbox.js"></script>
+    <script type="text/javascript" src="firebase.js"></script>
+    <script type="text/javascript" src="RTCMultiConnection-v1.2.js"></script>
+    <script type="text/javascript" src="webaudio.js"></script>
     <script type="text/javascript">
         var i=0;
         var sec=0;
@@ -166,6 +169,7 @@
 							
 							$prev_exten = $file_parts['extension'];
 							$i++;
+							echo "<script>console.log('$i');</script>";
 						}
 						
 						if($check == 1){
@@ -174,9 +178,9 @@
 							$row = mysql_fetch_array($result);
 							
 							if($row[user] != ""){
-								mysql_query("UPDATE music_sheet SET (extension = '$prev_exten', total_image = $i) WHERE user = '$login_session' ");
+								mysql_query("UPDATE music_sheet SET extension = '$prev_exten', total_image = '$i' WHERE user = '$login_session' ");
 							}else{
-								mysql_query("INSERT INTO music_sheet VALUES ('$login_session', '$prev_exten', $i)");
+								mysql_query("INSERT INTO music_sheet VALUES ('$login_session', '$prev_exten', '$i')");
 							}
 							
 							disconnect($conn);
@@ -258,7 +262,7 @@
 					
 					disconnect($conn);
 					?>
-                        <form enctype="multipart/form-data" action="admin.php" method="post" >
+                        <form enctype="multipart/form-data" action="client.php" method="post" >
                             <h3><font color='white'>Music Sheet Upload</font></h3>
                             <font color='white'>Choose File (.zip): <input type="file" name="sheet_zip" id="sheet_zip" accept="application/x-zip-compressed" /></font><br />
                             <a href="sample.php" target="_blank"><font color='grey'>Sample File</font></a><br />
@@ -367,7 +371,7 @@
 						echo "<div id='config' name=$flip>";
 						echo "<h3><font color='white'>Config</font></h3>";
 						
-						echo "<form action='admin.php' method='post' >";
+						echo "<form action='client.php' method='post' >";
 						
 						echo "<font color='white'>Metronome: </font><input type='text' id='metro' name='metro' value=$metro />";
 						echo "<font color='white'>Auto Flip (in second): </font><input type='text' id='flip' name='flip' value=$flip />";
@@ -375,6 +379,8 @@
 						disconnect($conn);
 					?>
 					<input type="submit" value="Set" />
+					<section id="local-media-stream"></section>
+					<section id="remote-media-streams"></section>
 					</form>
 					<input type='button' id="record" value='Record' onclick="start_record();" />
                     </div>

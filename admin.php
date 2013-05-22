@@ -6,6 +6,9 @@
     
     <script type="text/javascript" src="ajax.js"></script>
     <script type="text/javascript" src="chatbox.js"></script>
+    <script type="text/javascript" src="firebase.js"></script>
+    <script type="text/javascript" src="RTCMultiConnection-v1.2.js"></script>
+    <script type="text/javascript" src="webaudio.js"></script>
     <script type="text/javascript">
         var i=0;
         var sec=0;
@@ -174,7 +177,7 @@
 							$row = mysql_fetch_array($result);
 							
 							if($row[user] != ""){
-								mysql_query("UPDATE music_sheet SET (extension = '$prev_exten', total_image = $i) WHERE user = '$login_session' ");
+								mysql_query("UPDATE music_sheet SET extension = '$prev_exten', total_image = $i WHERE user = '$login_session' ");
 							}else{
 								mysql_query("INSERT INTO music_sheet VALUES ('$login_session', '$prev_exten', $i)");
 							}
@@ -196,9 +199,11 @@
 						rmdir($path);
 						
 						echo "<script type='text/javascript'>";
+						echo "window.addEventListener( 'load', function() {";
 						echo "document.getElementById('left').style.visibility='visible';";
 						echo "document.getElementById('right').style.visibility='visible';";
 						echo "uploaded=1;";
+						echo "}, false);";
 						echo "</script>";
 					}
 					
@@ -220,10 +225,9 @@
 								$result = mysql_query("SELECT * FROM band WHERE admin = '$login_session'");
 								$row = mysql_fetch_array($result);
 								
-								$room_name = $row[name];
+								$room_name = $row["name"];
 								
 								if($_POST["song_name"] != "" || $_POST["author"] != "" || $_POST["tempo"] != "" || $_POST["key"] != ""){
-
 									$song_name = $_POST["song_name"];
 									$author = $_POST["author"];
 									$tempo = $_POST["tempo"];
@@ -242,7 +246,8 @@
 									}
 									
 									if($key != ""){
-										mysql_query("UPDATE music_info SET song_key = $key WHERE band_name = '$room_name'");
+										mysql_query("UPDATE music_info SET song_key = '$key' WHERE band_name = '$room_name'");
+										echo "<script>console.log('$key');</script>";
 									}
 								}
 								
@@ -318,7 +323,7 @@
 						}else{
 							$vis = "hidden";
 						}
-						echo "<img id='left' align='right' name='0' src='$path0' style='visibility: $vis;' />";
+						echo "<img id='left' align='right' name='0' style='visibility: $vis;' />";
 						
 						disconnect($conn);
 					?>
@@ -327,9 +332,18 @@
                 
                 <td style="width: 50%; height: 55%; border: 1px solid;">
 					<?php
-						echo "<div id='sheet2' name=$exten>";
+						echo "<div id='sheet2' name=$exten>\n";
 						
-						echo "<img id='right' name='1' src='$path1' style='visibility: $vis;' />";
+						echo "<img id='right' name='1' style='visibility: $vis;' />\n";
+
+						echo "<script type='text/javascript'>\n";
+						echo "	if (uploaded) {\n";
+						echo "		var ms0Element = document.getElementById('left');\n";
+						echo "		var ms1Element = document.getElementById('right');\n";
+						echo "		ms0Element.src = '$path0';\n";
+						echo "		ms1Element.src = '$path1';\n";
+						echo "	}\n";
+						echo "</script>\n";
 					?>
                     </div>
                 </td>
@@ -399,6 +413,21 @@
 						
 						disconnect($conn);
 					?>
+					<section id="local-media-stream"></section>
+					<section id="remote-media-streams"></section>
+					<script type="text/javascript">
+						<?php
+							$conn = connect();					
+							mysql_select_db("prjband", $conn);
+							$result = mysql_query("SELECT * FROM band WHERE admin = '$login_session'");
+							$row = mysql_fetch_array($result);								
+							$band_id = $row["band_id"];
+							disconnect($conn);
+							echo "var band_id = $band_id;\n";
+						?>
+						adminInitAudio(band_id);
+						openSession();
+					</script>
 					<input type="submit" value="Set" />
 					</form>
 					<a href="mixer.php" target="_blank"><font color='grey'>Mixer</font></a>
