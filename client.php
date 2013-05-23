@@ -170,7 +170,7 @@
 								
 								$check = 0;
 							}else{
-								chmod($path . $entry, 0777);
+								chmod($path . $entry, 0755);
 							}
 							
 							$prev_exten = $file_parts['extension'];
