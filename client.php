@@ -8,7 +8,8 @@
     <script type="text/javascript" src="chatbox.js"></script>
     <script type="text/javascript" src="firebase.js"></script>
     <script type="text/javascript" src="RTCMultiConnection-v1.2.js"></script>
-    <script type="text/javascript" src="recorder.js"></script>
+	<script type="text/javascript" src="RecordRTC.js"></script>
+	<script type="text/javascript" src="audio-recorder.js"></script>
     <script type="text/javascript" src="webaudio.js"></script>
     <script type="text/javascript">
         var i=0;
@@ -65,6 +66,8 @@
 			if(record == 0){
 				record = 1;
 				document.getElementById("record").value = "Stop";
+				
+				startRecorder();
 			}else{
 				var img1 = document.getElementById("left");
 				var img2 = document.getElementById("right");
@@ -84,6 +87,8 @@
 				var path = "image/" + user + "/" + 1 + "." + exten;
 				img2.src = path;
 				img2.name = "1";
+				
+				stopRecorder();
 			}
 			
 			return false;
@@ -399,8 +404,9 @@
 							$band_id = $row["band_id"];
 							disconnect($conn);
 							echo "var band_id = $band_id;\n";
+							echo "var username = \"$login_session\";\n";
 						?>
-						initAudio(band_id);
+						initAudio(band_id, username);
 						joinSession();
 					</script>
 					</form>

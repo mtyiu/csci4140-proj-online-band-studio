@@ -64,24 +64,25 @@
 					$result = mysql_query("SELECT * FROM band WHERE admin = '$login_session'");
 					$row = mysql_fetch_array($result);
 					
-					$room_name = $row[name];
+					$band_id = $row[band_id];
 					
 					$admin = $row[admin];
 					
-					$result2 = mysql_query("SELECT * FROM mixer WHERE band = '$room_name'");
+					$result2 = mysql_query("SELECT * FROM mixer WHERE band = '$band_id'");
 					$row2 = mysql_fetch_array($result2);
 					
 					if($row2[band] == ""){
-						mysql_query("INSERT INTO mixer VALUES (0, '$room_name', '$row[admin]', 50, 50)");
+						mysql_query("INSERT INTO mixer VALUES (0, '$band_id', '$row[admin]', 50, 50)");
 					
 						$i=1;
 						while($i <= 3){
 							$player = "player" . $i;
-							mysql_query("INSERT INTO mixer VALUES ($i, '$room_name', '$row[$player]', 50, 50)");
+							echo "<script>console.log( \"INSERT INTO mixer VALUES ($i, '$band_id', '$row[$player]', 50, 50)\" );</script>";
+							mysql_query("INSERT INTO mixer VALUES ($i, '$band_id', '$row[$player]', 50, 50)");
 							$i++;
 						}
 					}else{
-						$result2 = mysql_query("SELECT * FROM mixer WHERE band = '$room_name'");
+						$result2 = mysql_query("SELECT * FROM mixer WHERE band = '$band_id'");
 						while($row2 = mysql_fetch_array($result2)){
 							if($row2[id] == 0){
 								$vol1 = $row2[volume];
@@ -105,10 +106,13 @@
 						}
 					}
 					
-					mysql_query("UPDATE mixer SET user = '$row[admin]' WHERE (id = 0) AND (band = '$room_name') ");
-					mysql_query("UPDATE mixer SET user = '$row[player1]' WHERE (id = 1) AND (band = '$room_name') ");
-					mysql_query("UPDATE mixer SET user = '$row[player2]' WHERE (id = 2) AND (band = '$room_name') ");
-					mysql_query("UPDATE mixer SET user = '$row[player3]' WHERE (id = 3) AND (band = '$room_name') ");
+					mysql_query("UPDATE mixer SET user = '$row[admin]' WHERE (id = 0) AND (band = '$band_id') ");
+					$i = 1;
+					while($i <= 3){
+						$player = "player" . $i;
+						mysql_query("UPDATE mixer SET user = '$row[$player]' WHERE (id = $i) AND (band = '$band_id') ") or die("$i");;
+						$i++;
+					}
 					
 					if($_POST["player1_vol"] != ""){
 						$vol1 = $_POST["player1_vol"];
