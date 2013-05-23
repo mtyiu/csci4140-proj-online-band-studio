@@ -1,60 +1,59 @@
 #signInForm, #messageForm {
-	margin:0px;
-	margin-bottom:1px;
+	margin: 0px;
+	margin-bottom: 1px;
 }
 #userName {
-	width: 150px;
-	height: 22px;
 	border: 1px teal solid;
-	float:left;
+	float: left;
+	height: 22px;
+	width: 150px;
 }
 #signInButt {
-	width: 60px;
 	height: 22px;
-}	
-#signInName{
-	font-family:Tahoma;
-	font-size:12px;
-	color:orange;
+	width: 60px;
+}
+#signInName {
+	color: orange;
+	font-family: Tahoma;
+	font-size: 12px;
 }
 #chatBox {
-	font-family:tahoma;
-	font-size:12px;
-	color:black;
 	border: 1px teal solid;
+	color: black;
+	float: left;
+	font-family: tahoma;
+	font-size: 12px;
 	height: 100px;
-	width: 400px;
 	overflow: scroll;
-	float:left;
-
+	width: 400px;
 }
-#usersOnLine{
-	font-family:tahoma;
-	font-size:14;
-	color:orange;
-	border:1px teal solid;
-	width:150px;
-	height:100px;
-	overflow:scroll;
-	margin-left:1px;
+#usersOnLine {
+	border: 1px teal solid;
+	color: orange;
+	font-family: tahoma;
+	font-size: 14;
+	height: 100px;
+	margin-left: 1px;
+	overflow: scroll;
+	width: 150px;
 }
 #message {
-	width: 350px;
-	height: 22px;
 	border: 1px teal solid;
-	float:left;
-	margin-top:1px;
+	float: left;
+	height: 22px;
+	margin-top: 1px;
+	width: 350px;
 }
 #send {
-	width: 50px;
+	float: left;
 	height: 22px;
-	float:left;
-	margin:1px;
+	margin: 1px;
+	width: 50px;
 }
-#serverRes{
-	width:150px;
-	height:22px;
+#serverRes {
 	border: 1px teal solid;
-	float:left;
-	margin:1px;
+	float: left;
+	height: 22px;
+	margin: 1px;
+	width: 150px;
 }

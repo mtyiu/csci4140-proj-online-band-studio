@@ -1,8 +1,7 @@
 <?php
-include('lock.php');
-include("config.php");
+	include("lock.php");
+	include("config.php");
 ?>
-
 
 <html>
     <head>
@@ -35,7 +34,7 @@ include("config.php");
                 
                 <div class="title">
                     
-                    <p> Welcome <?php echo $login_session; ?>      <button  onClick="logout()" value="Logout">Logout</button>
+                    <p> Welcome <?php echo $login_session; ?><button  onClick="logout()" value="Logout">Logout</button>
                     
                  
                 </div>               
@@ -44,7 +43,7 @@ include("config.php");
                         $sql = "SELECT * FROM `band` ;";
                         $result = mysql_query($sql) or die('MySQL query error');
                         $no_record = mysql_num_rows($result); 
-                        ?>
+                       ?>
                     <p style="color:#FFF">Please choose one of band rooms showed below or 
                         <button  onClick="create(<?php echo $no_record?>)" value="create">Create New Band room</button> </p>
                    
@@ -170,3 +169,4 @@ include("config.php");
         
     </body>
 </html>
+

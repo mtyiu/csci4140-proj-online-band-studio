@@ -1,3 +1,25 @@
+<?php
+	error_reporting(E_ALL);
+	ini_set('display_errors', '1');
+
+	function _post($str){
+	    $val = !empty($_POST[$str]) ? $_POST[$str] : null;
+	    return $val;
+	}
+
+	include('lock.php');
+	function connect(){
+		$conn = mysql_connect("localhost", "root", "csciband");
+		if(!$conn) {
+			die('Could not connect: ' . mysql_error());
+		}		
+		return $conn;
+	}
+	
+	function disconnect($conn){
+		mysql_close($conn);
+	}
+?>
 <html>
     <head>
         <title>Bandroom Admin</title>
@@ -11,6 +33,7 @@
 	<script type="text/javascript" src="RecordRTC.js"></script>
 	<script type="text/javascript" src="audio-recorder.js"></script>
     <script type="text/javascript" src="webaudio.js"></script>
+    <script type="text/javascript" src="set_client.js"></script>
     <script type="text/javascript">
         var i=0;
         var sec=0;
@@ -66,8 +89,31 @@
 			if(record == 0){
 				record = 1;
 				document.getElementById("record").value = "Stop";
-			
-				startRecorder();
+				var playerList = new Array();
+				<?php
+					// Generate player list
+					$conn = connect();					
+					mysql_select_db("prjband", $conn);
+					$result = mysql_query("SELECT * FROM acct WHERE user = '$login_session'");
+					$row = mysql_fetch_array($result);
+					$band_id = $row["band_id"];
+					echo "alert(\"$band_id\");";
+					$result = mysql_query("SELECT * FROM band WHERE band_id = '$band_id'");
+					$row = mysql_fetch_array($result);
+					if ( $row["admin"] != "" ) {
+						echo "playerList.push('${row["admin"]}');";
+						$isAdmin = ( $row["admin"] ==  $login_session ) ? true: false;
+					} else {
+						$isAdmin = false;
+					}
+					for ( $i = 1; $i <= 3; $i++ ) {
+						$player = "player" . $i;
+						if ( $row[$player] != "" )
+							echo "playerList.push('${row[$player]}');";
+					}
+					disconnect($conn);
+				?>
+				startRecorder(playerList);
 			}else{
 				var img1 = document.getElementById("left");
 				var img2 = document.getElementById("right");
@@ -80,13 +126,15 @@
 				i = 0;
 				document.getElementById("record").value = "Record";
 
-				var path = "image/" + user + "/" + 0 + "." + exten;
-				img1.src = path;
-				img1.name = "0";
+				if (uploaded) {
+					var path = "image/" + user + "/" + 0 + "." + exten;
+					img1.src = path;
+					img1.name = "0";
 				
-				var path = "image/" + user + "/" + 1 + "." + exten;
-				img2.src = path;
-				img2.name = "1";
+					path = "image/" + user + "/" + 1 + "." + exten;
+					img2.src = path;
+					img2.name = "1";
+				}
 
 				stopRecorder();
 			}
@@ -97,25 +145,9 @@
     </script>
     
     <body onload="signInOut();">
-		<?php
-			include('lock.php');
-			function connect(){
-				$conn = mysql_connect("localhost", "root", "csciband");
-				if(!$conn)
-				{
-					die('Could not connect: ' . mysql_error());
-				}
-				
-				return $conn;
-			}
-			
-			function disconnect($conn){
-				mysql_close($conn);
-			}
-		?>
 		
 		<?php
-			if($_FILES["sheet_zip"] != ""){
+			if(!empty($_FILES["sheet_zip"]) && $_FILES["sheet_zip"] != ""){
 				if($_FILES["sheet_zip"]["error"] > 0){
 					echo "<script type='text/javascript'>alert('Error: " . $_FILES["sheet_zip"]["error"] . "');</script>";
 				}else{
@@ -127,9 +159,9 @@
 					$result = mysql_query("SELECT * FROM music_sheet WHERE user = '$login_session'");
 					$row = mysql_fetch_array($result);
 					
-					if($row[total_image] != ""){
-						$no_of_image = $row[total_image];
-						$exten = $row[extension];
+					if($row["total_image"] != ""){
+						$no_of_image = $row["total_image"];
+						$exten = $row["extension"];
 						
 						$k = 0;
 						while($k < $no_of_image){
@@ -182,7 +214,7 @@
 							$result = mysql_query("SELECT * FROM music_sheet WHERE user = '$login_session'");
 							$row = mysql_fetch_array($result);
 							
-							if($row[user] != ""){
+							if($row["user"] != ""){
 								mysql_query("UPDATE music_sheet SET extension = '$prev_exten', total_image = $i WHERE user = '$login_session' ");
 							}else{
 								mysql_query("INSERT INTO music_sheet VALUES ('$login_session', '$prev_exten', $i)");
@@ -228,55 +260,48 @@
 								
 								mysql_select_db("prjband", $conn);
 								
-								$result = mysql_query("SELECT * FROM band WHERE admin = '$login_session'");
-								$row = mysql_fetch_array($result);
-								
-								$room_name = $row["name"];
-								
-								if($_POST["song_name"] != "" || $_POST["author"] != "" || $_POST["tempo"] != "" || $_POST["key"] != ""){
-									$song_name = $_POST["song_name"];
-									$author = $_POST["author"];
-									$tempo = $_POST["tempo"];
-									$key = $_POST["key"];
+								if (_post("song_name") != "" || _post("author") != "" || _post("tempo") != "" || _post("key") != "") {
+									$song_name = _post("song_name");
+									$author = _post("author");
+									$tempo = _post("tempo");
+									$key = _post("key");
 									
-									if($song_name != ""){
-										mysql_query("UPDATE music_info SET song_name = '$song_name' WHERE band_name = '$room_name'");
-									}
-									
-									if($author != ""){
-										mysql_query("UPDATE music_info SET author = '$author' WHERE band_name = '$room_name'");
-									}
-									
-									if($tempo != ""){
-										mysql_query("UPDATE music_info SET tempo = $tempo WHERE band_name = '$room_name'");
-									}
-									
-									if($key != ""){
-										mysql_query("UPDATE music_info SET song_key = '$key' WHERE band_name = '$room_name'");
-										echo "<script>console.log('$key');</script>";
-									}
+									if ($song_name != "")
+										mysql_query("UPDATE music_info SET song_name = '$song_name' WHERE band_id = '$band_id'");
+									if ($author != "")
+										mysql_query("UPDATE music_info SET author = '$author' WHERE band_id = '$band_id'");
+									if ($tempo != "")
+										mysql_query("UPDATE music_info SET tempo = $tempo WHERE band_id = '$band_id'");
+									if ($key != "")
+										mysql_query("UPDATE music_info SET song_key = '$key' WHERE band_id = '$band_id'");
 								}
 								
-								$result = mysql_query("SELECT * FROM music_info WHERE band_name = '$room_name'");
+								$result = mysql_query("SELECT * FROM music_info WHERE band_id = $band_id");
 								$row = mysql_fetch_array($result);
 								
-								if($row[band_name] == ""){
-									mysql_query("INSERT INTO music_info VALUES ('$room_name', '', '', 0, 0)");
-								}else{
-									$song_name = $row[song_name];
-									$author = $row[author];
-									$tempo = $row[tempo];
-									$key = $row[song_key];
+								if ( $row["band_id"] == "" ) {
+									echo "<script>console.log('insert');</script>";
+									mysql_query("INSERT INTO music_info VALUES ('$band_id', 'Untitled', 'N/A', 120, 'C')");
+									$result = mysql_query("SELECT * FROM music_info WHERE band_id = '$band_id'");
+									$row = mysql_fetch_array($result);
 								}
+
+								$song_name = $row["song_name"];
+								$author = $row["author"];
+								$tempo = $row["tempo"];
+								$key = $row["song_key"];
 							
 								disconnect($conn);
 							
-								echo "<font color='white'>Name  : </font><input type='text' id='song_name' name='song_name' value='$song_name' />";
-								echo "<font color='white'>Author: </font><input type='text' id='author' name='author' value='$author' /><br />";
-								echo "<font color='white'>Tempo : </font><input type='text' id='tempo' name='tempo' value='$tempo' />";
-								echo "<font color='white'>Key   : </font><input type='text' id='key' name='key' value='$key' /><br />";
+								echo "<table><tr>";
+								echo "<td align=right><font color='white'>Name:</font></td><td><input type='text' id='song_name' name='song_name' value='$song_name' /></td>";
+								echo "<td align=right><font color='white'>Author:</font></td><td><input type='text' id='author' name='author' value='$author' /><br /></td>";
+								echo "</tr><tr>";
+								echo "<td align=right><font color='white'>Tempo:</font></td><td><input type='text' id='tempo' name='tempo' value='$tempo' /></td>";
+								echo "<td align=right><font color='white'>Key:</font></td><td><input type='text' id='key' name='key' value='$key' /><br /></td>";
+								echo "</tr></table>";
 							?>
-                            <input type="submit" value="Set" />
+                            <input type="submit" value="Set" id="setSongBtn" />
                         </form>
                     </div>
                 </td>
@@ -287,11 +312,12 @@
 					
 					mysql_select_db("prjband", $conn);
 					$result = mysql_query("SELECT * FROM music_sheet WHERE user = '$login_session' ");
-					$row = mysql_fetch_array($result);
-					$no_of_image = $row[total_image];
-					
+					if ( $result ) {
+						$row = mysql_fetch_array($result);
+						$no_of_image = $row["total_image"];
+					} else
+						$no_of_image = 0;
                     echo "<div id='upload' name=$no_of_image >";
-					
 					disconnect($conn);
 					?>
                         <form enctype="multipart/form-data" action="admin.php" method="post" >
@@ -313,8 +339,11 @@
 						mysql_select_db("prjband", $conn);
 						
 						$result = mysql_query("SELECT * FROM music_sheet WHERE user = '$login_session' ");
-						$row = mysql_fetch_array($result);
-						$exten = $row[extension];
+						if ( $result ) {
+							$row = mysql_fetch_array($result);
+							$exten = $row["extension"];
+						}
+						$exten = "";
 						
 						$path = "image/" . $login_session . "/";
 						
@@ -386,12 +415,12 @@
 						$result = mysql_query("SELECT * FROM config WHERE user = '$login_session'");
 						$row = mysql_fetch_array($result);
 						
-						if($row[user] == ""){
+						if($row["user"] == ""){
 							mysql_query("INSERT INTO config VALUES ('$login_session', 0, 0)");
 						}else{
-							if($_POST["metro"] != "" || $_POST["flip"] != ""){
-								$metro = $_POST["metro"];
-								$flip = $_POST["flip"];
+							if(_post("metro") != "" || _post("flip") != ""){
+								$metro = _post("metro");
+								$flip = _post("flip");
 								
 								if($metro != ""){
 									mysql_query("UPDATE config SET metronome = $metro WHERE user = '$login_session'");
@@ -406,8 +435,8 @@
 						$result = mysql_query("SELECT * FROM config WHERE user = '$login_session'");
 						$row = mysql_fetch_array($result);
 						
-						$metro = $row[metronome];
-						$flip = $row[auto_flip];
+						$metro = $row["metronome"];
+						$flip = $row["auto_flip"];
 						
 						echo "<div id='config' name=$flip>";
 						echo "<h3><font color='white'>Config</font></h3>";
@@ -428,15 +457,21 @@
 						<?php
 							$conn = connect();					
 							mysql_select_db("prjband", $conn);
-							$result = mysql_query("SELECT * FROM band WHERE admin = '$login_session'");
+							$result = mysql_query("SELECT * FROM band WHERE band_id = '$band_id'");
 							$row = mysql_fetch_array($result);								
 							$band_id = $row["band_id"];
 							disconnect($conn);
 							echo "var band_id = $band_id;\n";
 							echo "var username = \"$login_session\";\n";
+							if ( !$isAdmin ) {
+								echo "setClient( band_id, username );";
+								echo "initAudio(band_id, username, false);";
+								echo "openSession();";
+							} else {
+								echo "initAudio(band_id, username, true);";
+								echo "joinSession();";
+							}
 						?>
-						initAudio(band_id, username);
-						openSession();
 					</script>
 					<input type="submit" value="Set" />
 					</form>

@@ -1,3 +1,27 @@
+<?php
+	error_reporting(E_ALL);
+	ini_set('display_errors', '1');
+
+	function _post($str){
+	    $val = !empty($_POST[$str]) ? $_POST[$str] : null;
+	    return $val;
+	}
+
+	include('lock.php');
+	function connect(){
+		$conn = mysql_connect("localhost", "root", "csciband");
+		if(!$conn)
+		{
+			die('Could not connect: ' . mysql_error());
+		}
+		
+		return $conn;
+	}
+	
+	function disconnect($conn){
+		mysql_close($conn);
+	}
+?>
 <html>
     <head>
         <title>Bandroom</title>
@@ -11,6 +35,7 @@
 	<script type="text/javascript" src="RecordRTC.js"></script>
 	<script type="text/javascript" src="audio-recorder.js"></script>
     <script type="text/javascript" src="webaudio.js"></script>
+    <script type="text/javascript" src="set_client.js"></script>
     <script type="text/javascript">
         var i=0;
         var sec=0;
@@ -96,7 +121,7 @@
         
     </script>
     
-    <body onload="signInOut();">
+    <body onload="signInOut(); set_client();">
 		<?php
 			include('lock.php');
 			function connect(){
@@ -406,7 +431,7 @@
 							echo "var band_id = $band_id;\n";
 							echo "var username = \"$login_session\";\n";
 						?>
-						initAudio(band_id, username);
+						initAudio(band_id, username, false);
 						joinSession();
 					</script>
 					</form>
