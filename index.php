@@ -1,6 +1,16 @@
 <?php
 	include( "config.php" );
 	session_start();
+	
+	// Check if a session already exist
+	$user_check = $_SESSION['login_user'];
+	$ses_sql = mysql_query("SELECT user FROM acct WHERE user='$user_check'");
+	$row = mysql_fetch_array($ses_sql);
+	$login_session = $row['user'];
+	if( isset( $login_session ) ) {
+	    header( "Location: welcome.php" );
+	}
+
 	if ( $_SERVER[ "REQUEST_METHOD" ] == "POST" ) {
 		// username and password sent from Form 
 		$myusername = addslashes( $_POST[ 'username' ] );
@@ -46,7 +56,7 @@
 
 								<table width="100%" border="0" cellpadding="3" cellspacing="1">
 									<tr>
-										<td colspan="3"><strong>Member Login </strong>
+										<td colspan="3"><strong>Member Login</strong>
 										</td>
 									</tr>
 									<tr>

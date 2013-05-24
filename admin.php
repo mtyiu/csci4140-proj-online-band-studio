@@ -97,7 +97,6 @@
 					$result = mysql_query("SELECT * FROM acct WHERE user = '$login_session'");
 					$row = mysql_fetch_array($result);
 					$band_id = $row["band_id"];
-					echo "alert(\"$band_id\");";
 					$result = mysql_query("SELECT * FROM band WHERE band_id = '$band_id'");
 					$row = mysql_fetch_array($result);
 					if ( $row["admin"] != "" ) {
@@ -466,10 +465,10 @@
 							if ( !$isAdmin ) {
 								echo "setClient( band_id, username );";
 								echo "initAudio(band_id, username, false);";
-								echo "openSession();";
+								echo "joinSession();";
 							} else {
 								echo "initAudio(band_id, username, true);";
-								echo "joinSession();";
+								echo "openSession();";
 							}
 						?>
 					</script>
