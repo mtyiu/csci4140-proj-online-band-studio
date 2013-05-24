@@ -30,14 +30,14 @@ function signInOut() {
 	if (signInForm.signInButt.name == "signIn") {
 		data = "user=" + signInForm.userName.value + "&oper=signin"
 		Ajax_Send("POST", "users.php", data, checkSignIn);
-		return false
+		return false;
 	}
 
 	// Sign out
 	if (signInForm.signInButt.name == "signOut") {
 		data = "user=" + signInForm.userName.value + "&oper=signout"
 		Ajax_Send("POST", "users.php", data, checkSignOut);
-		return false
+		return false;
 	}
 }
 

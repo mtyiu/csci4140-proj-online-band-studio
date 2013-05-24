@@ -31,10 +31,10 @@
 	$result = mysql_query( "SELECT * FROM band WHERE (admin = '$user') OR (player1 = '$user') OR (player2 = '$user') OR (player3 = '$user') " );
 	$row = mysql_fetch_array( $result );
 	
-	$band = $row[ name ];
+	$band = $row[ "name" ];
 	
-    $path = "chatroom/" . $row[ admin ] . "users.txt";
-	$path2 = "chatroom/" . $row[ admin ] . "room.txt";
+    $path = "chatroom/" . $row[ "admin" ] . "users.txt";
+	$path2 = "chatroom/" . $row[ "admin" ] . "room.txt";
 	
 	disconnect( $conn );
     
@@ -69,9 +69,9 @@
 			$result_image = mysql_query( "SELECT * FROM music_sheet WHERE user = '$user'" );
     		$row_image = mysql_fetch_array( $result_image );
 			
-			if ( $row_image[ total_image ] != "" ) {
-				$no_of_image = $row_image[ total_image ];
-				$exten = $row_image[ extension ];
+			if ( $row_image[ "total_image" ] != "" ) {
+				$no_of_image = $row_image[ "total_image" ];
+				$exten = $row_image[ "extension" ];
 				
 				$k = 0;
     			while ( $k < $no_of_image ) {
@@ -79,7 +79,7 @@
 					$k++;
 				}
     		}
-			if ( $row[ admin ] == $user ) {
+			if ( $row[ "admin" ] == $user ) {
 				unlink( $path );
 				unlink( $path2 );
 				
@@ -89,18 +89,18 @@
 				mysql_query( "DELETE FROM music_info WHERE band_name = '$band' " );
     			
 			} else {
-				$no_player = $row[ no_player ] - 1;
-				mysql_query( "UPDATE band SET no_player = $no_player WHERE admin = '$row[admin]' " );
-				if ( $row[ player1 ] == $user ) {
-					mysql_query( "UPDATE band SET player1 = '' WHERE admin = '$row[admin]' " );
+				$no_player = $row[ "no_player" ] - 1;
+				mysql_query( "UPDATE band SET no_player = $no_player WHERE admin = '${row['admin']}' " );
+				if ( $row[ "player1" ] == $user ) {
+					mysql_query( "UPDATE band SET player1 = '' WHERE admin = '${row['admin']}' " );
 				}
     			
-				if ( $row[ player2 ] == $user ) {
-					mysql_query( "UPDATE band SET player2 = '' WHERE admin = '$row[admin]' " );
+				if ( $row[ "player2" ] == $user ) {
+					mysql_query( "UPDATE band SET player2 = '' WHERE admin = '${row['admin']}' " );
 				}
     			
-				if ( $row[ player3 ] == $user ) {
-					mysql_query( "UPDATE band SET player3 = '' WHERE admin = '$row[admin]' " );
+				if ( $row[ "player3" ] == $user ) {
+					mysql_query( "UPDATE band SET player3 = '' WHERE admin = '${row['admin']}' " );
 				}
 				
     		}

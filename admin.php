@@ -19,6 +19,12 @@
 	function disconnect($conn){
 		mysql_close($conn);
 	}
+
+	$conn = connect();
+	mysql_select_db("prjband", $conn);
+	$result = mysql_query("SELECT * FROM acct WHERE user = '$login_session'");
+	$row = mysql_fetch_array($result);
+	$band_id = $row["band_id"];
 ?>
 <html>
     <head>
@@ -86,33 +92,24 @@
         }, 1000);
 		
 		function start_record(){
+			<?php echo "var bandid = $band_id;"; ?>
 			if(record == 0){
 				record = 1;
 				document.getElementById("record").value = "Stop";
-				var playerList = new Array();
-				<?php
-					// Generate player list
-					$conn = connect();					
-					mysql_select_db("prjband", $conn);
-					$result = mysql_query("SELECT * FROM acct WHERE user = '$login_session'");
-					$row = mysql_fetch_array($result);
-					$band_id = $row["band_id"];
-					$result = mysql_query("SELECT * FROM band WHERE band_id = '$band_id'");
-					$row = mysql_fetch_array($result);
-					if ( $row["admin"] != "" ) {
-						echo "playerList.push('${row["admin"]}');";
-						$isAdmin = ( $row["admin"] ==  $login_session ) ? true: false;
+				// Get player list
+				var request = new XMLHttpRequest();
+				request.open( "GET", "getPlayerList.php?band_id=" + bandid, false );
+				request.send();
+				if ( request.readyState == 4 ) {
+					if ( request.status != 200 ) {
+						alert( "Error code = " + request.status );
+						record = 0;
 					} else {
-						$isAdmin = false;
+						var playerList = JSON.parse( request.responseText );
+						console.log( playerList );
+						startRecorder( playerList );
 					}
-					for ( $i = 1; $i <= 3; $i++ ) {
-						$player = "player" . $i;
-						if ( $row[$player] != "" )
-							echo "playerList.push('${row[$player]}');";
-					}
-					disconnect($conn);
-				?>
-				startRecorder(playerList);
+				}
 			}else{
 				var img1 = document.getElementById("left");
 				var img2 = document.getElementById("right");
@@ -462,6 +459,7 @@
 							disconnect($conn);
 							echo "var band_id = $band_id;\n";
 							echo "var username = \"$login_session\";\n";
+							$isAdmin = ( $row["admin"] == $login_session ) ? true : false;
 							if ( !$isAdmin ) {
 								echo "setClient( band_id, username );";
 								echo "initAudio(band_id, username, false);";
@@ -476,7 +474,6 @@
 					</form>
 					<a href="mixer.php" target="_blank"><font color='grey'>Mixer</font></a>
 					<input type='button' id="record" value='Record' onclick="start_record();" />
-					<div id="dllink"></div>
                     </div>
                 </td>
             </tr>

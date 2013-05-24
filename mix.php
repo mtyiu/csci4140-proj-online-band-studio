@@ -9,9 +9,25 @@
 	include('lock.php');
 	include("config.php");
 
-//	header( "Content-type: text/plain" );
+	header( "Content-type: text/plain" );
 
-	$id = 1;
+	$sql = "SELECT * FROM `acct` WHERE user='$login_session';";
+	$result = mysql_query($sql) or die('MySQL query error #2');
+	$row = mysql_fetch_array($result);
+	$id = $row["band_id"];
+	
+	$sql = "SELECT * FROM `band` WHERE band_id='$id';";
+	$result = mysql_query($sql) or die('MySQL query error #1');
+	$row = mysql_fetch_array($result);
+	if ( $row["admin"] != $login_session ) {
+		$filename = glob( "$OUTPUT_DIR/${id}_*.wav" );
+		if ( $filename )
+			echo $filename[0];
+		else
+			echo "0";
+		return;
+	}
+
 	$sql = "SELECT * FROM `mixer` WHERE band='$id';";
 	$result = mysql_query($sql) or die('MySQL query error #1');
 
@@ -44,11 +60,13 @@
 	$tmp_command = "-a:all -o $output_file";
 	$command = "TERM=dumb " . $command . $tmp_command . " 2>&1";
 	exec( $command, $output );
+/*
 	echo "<pre>";
 	echo "$command\n";
 	foreach ($output as &$i) {
 		echo $i . "\n";
 	}
 	echo "</pre>";
-	echo "<a href=\"$output_file\">$output_file</a>";
+*/
+	echo "$output_file";
 ?>

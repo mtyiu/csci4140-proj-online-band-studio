@@ -10,7 +10,6 @@ var bglayer;
 var promptlayer;
 
 function initAudio( currentSessionID, my_username, isadmin ) {
-	console.log( "initAudio" );
 	sessionID = currentSessionID;
 	username = my_username;
 	isAdmin = isadmin;
@@ -98,13 +97,11 @@ function setPromptLayer( e ) {
 }
 
 function openSession() {
-	console.log( "openSession" );
     var sessionid = location.hash.replace('#', '');
 	connection.open(sessionid);
 };
 
 function joinSession() {
-	console.log( "joinSession" );
     var sessionid = location.hash.replace('#', '');
 	connection.connect(sessionid);
 };
@@ -125,10 +122,6 @@ function stopRecorder() {
 
 function uploadWAV(url) {
 	var wavData = recorder.getBlob();
-	var request = new XMLHttpRequest();
-	request.open( "POST", "upload.php", true );
-	request.setRequestHeader( "BAND_ID", sessionID );
-	request.setRequestHeader( "USERNAME", username );
 
 	/* DOM Manipulation */
 	var h1Element = document.createElement("h2");
@@ -139,6 +132,7 @@ function uploadWAV(url) {
 	progressElement.max = 100;
 	progressElement.value = 0;
 	progressElement.style.width = "100%";
+	
 
 	var tableElement = document.createElement( "table" );
 	tableElement.width = "90%";
@@ -146,64 +140,143 @@ function uploadWAV(url) {
 	tableElement.align = "center";
 	promptlayer.appendChild( tableElement );
 
-	var trElements = [];
-	var tdElements = [];
-	var tdWidth = [ "35%", "55%" ];
-	var tdAlign = [ "right", "left" ];
+	var trElements = new Array();
+	var tdElements = new Array();
+	var saveElements = new Array();
+	var tdWidth = [ "30%", "50%", "10%" ];
+	var tdAlign = [ "right", "left", "center" ];
 	var numPlayers = playerlist.length;
-	for (var i = 0; i < numPlayers + 1; i++) {
+	for (var i = 0; i < numPlayers; i++) {
 		trElements[i] = document.createElement("tr");
-		for (var j = 0; j < 2; j++) {
-			tdElements[i * 2 + j] = document.createElement("td");
-			tdElements[i * 2 + j].width = tdWidth[j];
-			tdElements[i * 2 + j].height = "30";
-			tdElements[i * 2 + j].align = tdAlign[j];
-			trElements[i].appendChild( tdElements[i * 2 + j] );
+		for (var j = 0; j < 3; j++) {
+			tdElements[i * 3 + j] = document.createElement("td");
+			tdElements[i * 3 + j].width = tdWidth[j];
+			tdElements[i * 3 + j].height = "30";
+			tdElements[i * 3 + j].align = tdAlign[j];
+			trElements[i].appendChild( tdElements[i * 3 + j] );
 		}
-		if ( i < numPlayers ) {
-			tdElements[i * 2].innerHTML = "<b>" + playerlist[i] + ": </b>";
-			if ( playerlist[i] == username )
-				tdElements[i * 2 + 1].appendChild( progressElement );
-			else
-				tdElements[i * 2 + 1].innerHTML = "Uploading...";
+		tdElements[i * 3].innerHTML = "<b>" + playerlist[i] + ": </b>";
+		saveElements[i] = document.createElement("a");
+		saveElements[i].target = "_blank";
+		saveElements[i].innerHTML = "Save";
+		if ( playerlist[i] == username ) {
+			tdElements[i * 3 + 1].appendChild( progressElement );
+			saveElements[i].href = url;
+			tdElements[i * 3 + 2].appendChild( saveElements[i] );
+		} else {
+			saveElements[i].href = "tmp/" + sessionID + "_" + playerlist[i] + ".wav";
+			tdElements[i * 3 + 1].innerHTML = "Uploading...";
 		}
 		tableElement.appendChild( trElements[i] );
 	}
 
-	request.upload.addEventListener( "progress",
+	var uploadRequest = new XMLHttpRequest();
+	uploadRequest.open( "POST", "upload.php", true );
+	uploadRequest.setRequestHeader( "BAND_ID", sessionID );
+	uploadRequest.setRequestHeader( "USERNAME", username );
+	uploadRequest.upload.addEventListener( "progress",
 		function (e) {
 			var percent = Math.round( e.loaded / e.total * 100 );
-			console.log( percent );
 			progressElement.value = percent;
 		},
 		false );
-	request.send( wavData );
-
-	request.onreadystatechange = function() {
-		if (request.readyState == 4) {
-			if (request.status != 200)
-				alert( "Error code = " + new String( request.status ) );
+	uploadRequest.send( wavData );
+	uploadRequest.onreadystatechange = function() {
+		if (uploadRequest.readyState == 4) {
+			if (uploadRequest.status != 200)
+				alert( "Error code = " + new String( uploadRequest.status ) );
 			else {
-				console.log( request.responseText );
-				console.log( "WAV uploaded." );
+				progressElement.value = 100;
+				console.log( uploadRequest.responseText );
 			}
 		}
 	};
 
-	createDownloadLink(url);
-}
-function createDownloadLink(url) {
-	var li = document.createElement('li');
-	var au = document.createElement('audio');
-	var hf = document.createElement('a');
-	
-	au.controls = true;
-	au.src = url;
-	hf.href = url;
-	hf.download = url;
-	hf.innerHTML = hf.download;
-	li.appendChild(au);
-	li.appendChild(hf);
-	var dllinkElement = document.getElementById("dllink");
-	dllinkElement.appendChild(li);
+	var getFileStatusRequests = new Array();
+	for (var i = 0; i < numPlayers; i++) {
+		var request = new XMLHttpRequest();
+		request.finished = false;
+		request.i = i;
+		request.url = "getFileStatus.php?filename=" + sessionID + "_" + playerlist[i];
+		request.onreadystatechange = function() {
+			var req = this;
+			var i = req.i;
+			if (req.readyState == 4) {
+				if ( req.status != 200 )
+					alert( "Error code = " + new String( req.status ) );
+				else {
+					if ( req.responseText == "0" ) {
+						if ( playerlist[i] != username )
+							tdElements[i * 3 + 1].innerHTML = "Uploading...";
+					} else if ( req.responseText == "1" ) {
+						req.finished = true;
+						if ( playerlist[i] != username ) {
+							tdElements[i * 3 + 1].innerHTML = "Uploaded.";
+							tdElements[i * 3 + 2].appendChild( saveElements[i] );
+						}
+						checkAllFinished();
+					}
+				}
+			}
+		}
+		request.intervalEvent = window.setInterval(
+			function() {
+				var req = request;
+				return function( e ) {
+					if ( !req.finished ) {
+						req.open( "GET", req.url, true );
+						req.send();
+					}
+					if ( req.finished )
+						window.clearInterval( req.intervalEvent );
+				}
+			}(), 1000 );
+		request.open( "GET", request.url, true );
+		request.send();
+		getFileStatusRequests.push( request );
+	}
+
+	var checkAllFinished = function() {
+		for ( var i = 0; i < getFileStatusRequests.length; i++ ) {
+			console.log( i + ": " + getFileStatusRequests[i].finished );
+			if ( !getFileStatusRequests[i].finished )
+				return;
+		}
+
+		var mixPElement = document.createElement("p");
+		mixPElement.align = "center";
+		mixPElement.innerHTML = "Mixing your song...";
+		promptlayer.appendChild( mixPElement );
+		var mixRequest = new XMLHttpRequest();
+		mixRequest.onreadystatechange = function() {
+			if ( mixRequest.readyState == 4 ) {
+				if ( mixRequest.status != 200 ) {
+					alert( "Error code = " + mixRequest.status );
+				} else {
+					if ( mixRequest.responseText != "0" ) {
+						mixRequest.finished = true;
+						mixPElement.innerHTML = "Mixing completed. <a href=\"" + mixRequest.responseText + "\" target=\"_blank\">Download Link</a>";
+					}
+					console.log( mixRequest.responseText );
+				}
+			}
+		}
+		if ( !isAdmin ) {
+			mixRequest.finished = false;
+			mixRequest.intervalEvent = window.setInterval(
+				function() {
+					var req = mixRequest;
+					return function( e ) {
+						if ( !req.finished ) {
+							req.open( "GET", "mix.php", true );
+							req.send();
+						}
+						if ( req.finished )
+							window.clearInterval( req.intervalEvent );
+					}
+				}(), 1000 );
+		}
+		mixRequest.open( "GET", "mix.php", true );
+		mixRequest.send();
+	}
 }
