@@ -82,13 +82,13 @@ function join(id) {
 				var ans = Request.responseText;
 
 				if (ans == "1") {
-					window.location.assign("admin.php");
+					window.location.assign("bandroom.php");
 				}
 				if (ans == "2") {
-					window.location.assign("admin.php");
+					window.location.assign("bandroom.php");
 				}
 				if (ans == "3") {
-					window.location.assign("admin.php");
+					window.location.assign("bandroom.php");
 				}
 				console.log(ans);
 			}

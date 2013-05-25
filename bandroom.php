@@ -140,7 +140,7 @@
         
     </script>
     
-    <body onload="signInOut();">
+    <body onload="signInOut();" onbeforeunload="autoSignOut();">
 		
 		<?php
 			if(!empty($_FILES["sheet_zip"]) && $_FILES["sheet_zip"] != ""){
@@ -249,7 +249,7 @@
             <tr>
                 <td style="width: 50%; height: 20%; border: 1px solid;">
                     <div id="song_info">
-                        <form action="admin.php" method="post" >
+                        <form action="bandroom.php" method="post" >
                             <h3><font color="white">Song Information</font></h3>
 							<?php							
 								$conn = connect();
@@ -316,7 +316,7 @@
                     echo "<div id='upload' name=$no_of_image >";
 					disconnect($conn);
 					?>
-                        <form enctype="multipart/form-data" action="admin.php" method="post" >
+                        <form enctype="multipart/form-data" action="bandroom.php" method="post" >
                             <h3><font color='white'>Music Sheet Upload</font></h3>
                             <font color='white'>Choose File (.zip): <input type="file" name="sheet_zip" id="sheet_zip" accept="application/x-zip-compressed" /></font><br />
                             <a href="sample.php" target="_blank"><font color='grey'>Sample File</font></a><br />
@@ -437,7 +437,7 @@
 						echo "<div id='config' name=$flip>";
 						echo "<h3><font color='white'>Config</font></h3>";
 						
-						echo "<form action='admin.php' method='post' >";
+						echo "<form action='bandroom.php' method='post' >";
 						
 						echo "<font color='white'>Metronome: </font><input type='text' id='metro' name='metro' value=$metro />";
 						echo "<font color='white'>Auto Flip (in second): </font><input type='text' id='flip' name='flip' value=$flip />";

@@ -130,12 +130,12 @@
                              echo "<p id=players ><strong>No. of Players Available:</strong> {$row['no_player']}</p>";
                             echo "<p id=desc ><strong>Description:</strong> {$row['content']}</p>";
                             if ($row['no_player'] < 4){
-                                echo " <img id=jopic1 onclick=join(1) align=right src=join.png  onmouseover=this.src='join2.png' onmouseout=this.src='join.png' style='visibility:visible;'>
+                                echo " <a href='javascript:;'><img id=jopic1 onclick=join(1) align=right src=join.png  onmouseover=this.src='join2.png' onmouseout=this.src='join.png' style='visibility:visible;'></a>
                             ";
                             }
                              else{
                             
-                                echo " <img id=jopic1 onclick=join(1) align=right src=join.png  onmouseover=this.src='join2.png' onmouseout=this.src='join.png' style='visibility:hidden;'>";
+                                echo "<a href='javscript:;'><img id=jopic1 onclick=join(1) align=right src=join.png  onmouseover=this.src='join2.png' onmouseout=this.src='join.png' style='visibility:hidden;'></a>";
                           
                           }
                                ?>   

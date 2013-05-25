@@ -2,6 +2,8 @@ var connection;
 var sessionID;
 var localMediaStream;
 var recorder;
+var time;
+var waitAck;
 var playerlist;
 var username;
 var isAdmin;
@@ -21,7 +23,7 @@ function initAudio( currentSessionID, my_username, isadmin ) {
 	connection.onleave = function( userid, extra ) {
 		console.log( userid );
 		if (!isadmin) signInOut();
-	}
+	};
 	connection.onstream = function (stream) {
 		if (stream.type === 'remote') {
 			var mediaElement = stream.mediaElement;
@@ -70,6 +72,7 @@ function initAudio( currentSessionID, my_username, isadmin ) {
 	setPromptLayer();
 	window.addEventListener( "resize", setPromptLayer, false );
 	window.addEventListener( "scroll", setPromptLayer, false );
+
 }
 
 function messageMux( message ) {
@@ -77,7 +80,18 @@ function messageMux( message ) {
 	switch( message ) {
 		case "start":
 		case "end":
+			var timer = new Date();
+			time = timer.getTime();
+			connection.send( 'ack' );
 			start_record();
+			break;
+		case "ack":
+			if ( waitAck ) {
+				var timer = new Date();
+				console.log( "[ACK] Timeout: " + (5000 - (timer.getTime() - time)) );
+				window.setTimeout( recorder.recordAudio, 5000 - (timer.getTime() - time) );
+			}
+			waitAck = false;
 			break;
 	}
 }
@@ -98,19 +112,26 @@ function setPromptLayer( e ) {
 
 function openSession() {
     var sessionid = location.hash.replace('#', '');
-	connection.open(sessionid);
+	connection.open( sessionid );
 };
 
 function joinSession() {
     var sessionid = location.hash.replace('#', '');
-	connection.connect(sessionid);
+	connection.connect( sessionid );
 };
 
 function startRecorder( playerList ) {
 	playerlist = playerList;
-	if (isAdmin)
+	if (isAdmin) {
+		var timer = new Date();
+		time = timer.getTime();
 		connection.send( 'start' );
-	recorder.recordAudio();
+		waitAck = true;
+	} else {
+		var timer = new Date();
+		console.log( "[START] Timeout: " + (5000 - (timer.getTime() - time)) );
+		window.setTimeout( recorder.recordAudio, 5000 - (timer.getTime() - time) );
+	}
 }
 
 function stopRecorder() {
@@ -121,7 +142,8 @@ function stopRecorder() {
 }
 
 function uploadWAV(url) {
-	var wavData = recorder.getBlob();
+//	var wavData = recorder.getBlob();
+	var wavData = url;
 
 	/* DOM Manipulation */
 	var h1Element = document.createElement("h2");

@@ -67,7 +67,8 @@
 			$image_path = "image/" . $user . "/";
 			
 			$result_image = mysql_query( "SELECT * FROM music_sheet WHERE user = '$user'" );
-    		$row_image = mysql_fetch_array( $result_image );
+    		if ( $result_image )
+				$row_image = mysql_fetch_array( $result_image );
 			
 			if ( $row_image[ "total_image" ] != "" ) {
 				$no_of_image = $row_image[ "total_image" ];
@@ -90,17 +91,17 @@
     			
 			} else {
 				$no_player = $row[ "no_player" ] - 1;
-				mysql_query( "UPDATE band SET no_player = $no_player WHERE admin = '${row['admin']}' " );
+				mysql_query( "UPDATE band SET no_player = $no_player WHERE admin = '${row['admin']}' " ) or die( "#1" );
 				if ( $row[ "player1" ] == $user ) {
-					mysql_query( "UPDATE band SET player1 = '' WHERE admin = '${row['admin']}' " );
+					mysql_query( "UPDATE band SET player1 = '' WHERE admin = '${row['admin']}' " ) or die( "#2" );
 				}
     			
 				if ( $row[ "player2" ] == $user ) {
-					mysql_query( "UPDATE band SET player2 = '' WHERE admin = '${row['admin']}' " );
+					mysql_query( "UPDATE band SET player2 = '' WHERE admin = '${row['admin']}' " ) or die( "#3" );
 				}
     			
 				if ( $row[ "player3" ] == $user ) {
-					mysql_query( "UPDATE band SET player3 = '' WHERE admin = '${row['admin']}' " );
+					mysql_query( "UPDATE band SET player3 = '' WHERE admin = '${row['admin']}' " ) or die( "#4" );
 				}
 				
     		}

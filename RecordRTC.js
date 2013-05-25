@@ -104,6 +104,7 @@ function RecordRTC(config) {
             fileName: (Math.random() * 1000 << 1000) + '.' + fileType,
             size: blobURL.length,
             onsuccess: function (fileEntry) {
+				console.log( fileEntry );
                 fileSystemURL = fileEntry.toURL();
                 if (callback) callback(fileSystemURL);
             },

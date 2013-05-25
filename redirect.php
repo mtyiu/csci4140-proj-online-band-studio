@@ -15,7 +15,6 @@
 		$player = "player" . ($no_pp - 1);
 		$sql = "UPDATE `band` SET $player='$login_session' WHERE band_id='$id' ;";
 		$result = mysql_query( $sql ) or die( 'MySQL query error #2' );
-		$no_pp = $no_pp + 1;
 		$sql = "UPDATE `band` SET `no_player`='$no_pp' WHERE band_id='$id';";
 		$result = mysql_query( $sql ) or die( 'MySQL query error #3' );
 		$sql = "UPDATE acct SET band_id = $id WHERE user = '$login_session'";

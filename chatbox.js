@@ -1,5 +1,5 @@
 lastReceived = 0;
-
+var isLogOut;
 // Hide the message form
 
 function hideShow(hs) {
@@ -41,16 +41,25 @@ function signInOut() {
 	}
 }
 
+function autoSignOut() {
+	if ( !isLogOut ) {
+		data = "user=" + signInForm.userName.value + "&oper=signout"
+		Ajax_Send("POSTSYNC", "users.php", data, checkSignOut);
+	}
+	return false;
+}
+
 // Sign in response
 
 function checkSignIn(res) {
 	if (res == "userexist") {
 		alert("The user name you typed is already exist\nPlease try another one");
+		isLogOut = true;
 		return false;
 	}
 	if (res == "signin") {
-		hideShow("show")
-
+		hideShow("show");
+		isLogOut = false;
 		messageForm.message.focus()
 		updateInterval = setInterval("updateInfo()", 3000);
 		serverRes.innerHTML = "Sign in"
@@ -62,60 +71,61 @@ function checkSignIn(res) {
 function checkSignOut(res) {
 	if (res == "usernotfound") {
 		serverRes.innerHTML = "Sign out error";
-		res = "signout"
+		res = "signout";
 	}
 	if (res == "signout") {
-		hideShow("hide")
-		signInForm.userName.focus()
-		clearInterval(updateInterval)
-		serverRes.innerHTML = "Sign out"
-		return false
+		hideShow("hide");
+		isLogOut = true;
+		signInForm.userName.focus();
+		clearInterval(updateInterval);
+		serverRes.innerHTML = "Sign out";
+		return false;
 	}
 }
 
 // Update info
 
 function updateInfo() {
-	serverRes.innerHTML = "Updating"
-	Ajax_Send("POST", "users.php", "&user=" + signInForm.userName.value, showUsers)
-	Ajax_Send("POST", "receive.php", "lastreceived=" + lastReceived + "&user=" + signInForm.userName.value, showMessages)
+	serverRes.innerHTML = "Updating";
+	Ajax_Send("POST", "users.php", "&user=" + signInForm.userName.value, showUsers);
+	Ajax_Send("POST", "receive.php", "lastreceived=" + lastReceived + "&user=" + signInForm.userName.value, showMessages);
 }
 
 // update online users
 
 function showUsers(res) {
-	usersOnLine.innerHTML = res
+	usersOnLine.innerHTML = res;
 }
 
 // Update messages view
 
 function showMessages(res) {
-	serverRes.innerHTML = ""
-	msgTmArr = res.split("<SRVTM>")
-	lastReceived = msgTmArr[1]
-	messages = document.createElement("span")
-	messages.innerHTML = msgTmArr[0]
-	chatBox.appendChild(messages)
-	chatBox.scrollTop = chatBox.scrollHeight
+	serverRes.innerHTML = "";
+	msgTmArr = res.split("<SRVTM>");
+	lastReceived = msgTmArr[1];
+	messages = document.createElement("span");
+	messages.innerHTML = msgTmArr[0];
+	chatBox.appendChild(messages);
+	chatBox.scrollTop = chatBox.scrollHeight;
 }
 
 // Send message
 
 function sendMessage() {
-	data = "message=" + messageForm.message.value + "&user=" + signInForm.userName.value
-	serverRes.innerHTML = "Sending"
-	Ajax_Send("POST", "send.php", data, sentOk)
+	data = "message=" + messageForm.message.value + "&user=" + signInForm.userName.value;
+	serverRes.innerHTML = "Sending";
+	Ajax_Send("POST", "send.php", data, sentOk);
 }
 
 // Sent Ok
 
 function sentOk(res) {
 	if (res == "sentok") {
-		messageForm.message.value = ""
-		messageForm.message.focus()
-		serverRes.innerHTML = "Sent"
+		messageForm.message.value = "";
+		messageForm.message.focus();
+		serverRes.innerHTML = "Sent";
 	} else {
-		serverRes.innerHTML = "Not sent"
+		serverRes.innerHTML = "Not sent";
 	}
 }
 

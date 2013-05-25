@@ -60,13 +60,15 @@
 	$tmp_command = "-a:all -o $output_file";
 	$command = "TERM=dumb " . $command . $tmp_command . " 2>&1";
 	exec( $command, $output );
-/*
+
+	/*
 	echo "<pre>";
 	echo "$command\n";
 	foreach ($output as &$i) {
 		echo $i . "\n";
 	}
 	echo "</pre>";
-*/
+	*/
+
 	echo "$output_file";
 ?>

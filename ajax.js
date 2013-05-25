@@ -36,9 +36,16 @@ function Ajax_Send(GP, URL, PARAMETERS, RESPONSEFUNCTION) {
 		xmlhttp.send(null);
 	}
 
-	if (GP = "POST") {
+	if (GP == "POST") {
 		PARAMETERS = encodeURI(PARAMETERS);
 		xmlhttp.open("POST", URL, true);
+		xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		xmlhttp.send(PARAMETERS);
+	}
+	
+	if (GP == "POSTSYNC") {
+		PARAMETERS = encodeURI(PARAMETERS);
+		xmlhttp.open("POST", URL, false);
 		xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		xmlhttp.send(PARAMETERS);
 	}

@@ -26,7 +26,7 @@
 		$sql = "INSERT INTO $tbl_name (band_id, name, admin, no_player, content, player1, player2, player3) VALUES ('$id', '$myband', '$login_session', 1, '$des', '', '', '')";
 		$result = mysql_query( $sql );
 		if ( $result ) {
-			header( "location: admin.php" );
+			header( "location: bandroom.php" );
 		}
 		$sql = "UPDATE acct SET band_id = $id WHERE user = '$login_session'";
 		$result = mysql_query( $sql );
