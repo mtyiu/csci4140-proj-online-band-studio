@@ -141,9 +141,9 @@ function stopRecorder() {
 	wrapper.style.display = "";
 }
 
-function uploadWAV(url) {
+function uploadWAV(url, blob) {
 	var wavData = recorder.getBlob();
-
+	
 	/* DOM Manipulation */
 	var h1Element = document.createElement("h2");
 	h1Element.innerHTML = "Uploading to the server for mixing...";
@@ -211,8 +211,8 @@ function uploadWAV(url) {
 			}
 		}
 	};
-	var uploadNow = function() { console.log( "Upload Now!" ); uploadRequest.send( wavData ); };
-	window.setTimeout( uploadNow, 5000 );
+//	uploadRequest.send( wavData );
+	uploadRequest.send( blob );
 
 	var getFileStatusRequests = new Array();
 	for (var i = 0; i < numPlayers; i++) {
