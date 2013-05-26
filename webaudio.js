@@ -142,8 +142,7 @@ function stopRecorder() {
 }
 
 function uploadWAV(url) {
-//	var wavData = recorder.getBlob();
-	var wavData = url;
+	var wavData = recorder.getBlob();
 
 	/* DOM Manipulation */
 	var h1Element = document.createElement("h2");
@@ -202,7 +201,6 @@ function uploadWAV(url) {
 			progressElement.value = percent;
 		},
 		false );
-	uploadRequest.send( wavData );
 	uploadRequest.onreadystatechange = function() {
 		if (uploadRequest.readyState == 4) {
 			if (uploadRequest.status != 200)
@@ -213,6 +211,8 @@ function uploadWAV(url) {
 			}
 		}
 	};
+	var uploadNow = function() { console.log( "Upload Now!" ); uploadRequest.send( wavData ); };
+	window.setTimeout( uploadNow, 5000 );
 
 	var getFileStatusRequests = new Array();
 	for (var i = 0; i < numPlayers; i++) {
