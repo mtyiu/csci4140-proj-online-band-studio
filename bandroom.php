@@ -112,7 +112,6 @@
 						record = 0;
 					} else {
 						var playerList = JSON.parse( request.responseText );
-						console.log( playerList );
 						startRecorder( playerList );
 					}
 				}

@@ -121,7 +121,6 @@ function RecordRTC(config) {
         var reader = new win.FileReader();
         reader.readAsDataURL(blobURL);
         reader.onload = function (event) {
-			console.log( "reader.onload completed." );
             blobURL2 = event.target.result;
         };
     }

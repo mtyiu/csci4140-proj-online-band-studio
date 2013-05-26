@@ -76,7 +76,7 @@ function initAudio( currentSessionID, my_username, isadmin ) {
 }
 
 function messageMux( message ) {
-	console.log( message );
+	console.log( "Message received: " + message );
 	switch( message ) {
 		case "start":
 		case "end":
@@ -134,39 +134,43 @@ function startRecorder( playerList ) {
 	}
 }
 
+var h1Element;
+var progressElement;
+var tableElement;
+var trElements;
+var tdElements;
+var saveElements;
+var tdWidth;
+var tdAlign;
+var numPlayers;
+
 function stopRecorder() {
 	if (isAdmin)
 		connection.send( 'end' );
 	recorder.stopAudio( uploadWAV );
-	wrapper.style.display = "";
-}
-
-function uploadWAV(url, blob) {
-	var wavData = recorder.getBlob();
 	
 	/* DOM Manipulation */
-	var h1Element = document.createElement("h2");
+	h1Element = document.createElement("h2");
 	h1Element.innerHTML = "Uploading to the server for mixing...";
 	promptlayer.appendChild( h1Element );
 	
-	var progressElement = document.createElement( "progress" );
+	progressElement = document.createElement( "progress" );
 	progressElement.max = 100;
 	progressElement.value = 0;
 	progressElement.style.width = "100%";
-	
 
-	var tableElement = document.createElement( "table" );
+	tableElement = document.createElement( "table" );
 	tableElement.width = "90%";
 	tableElement.border = "0";
 	tableElement.align = "center";
 	promptlayer.appendChild( tableElement );
 
-	var trElements = new Array();
-	var tdElements = new Array();
-	var saveElements = new Array();
-	var tdWidth = [ "30%", "50%", "10%" ];
-	var tdAlign = [ "right", "left", "center" ];
-	var numPlayers = playerlist.length;
+	trElements = new Array();
+	tdElements = new Array();
+	saveElements = new Array();
+	tdWidth = [ "30%", "50%", "10%" ];
+	tdAlign = [ "right", "left", "center" ];
+	numPlayers = playerlist.length;
 	for (var i = 0; i < numPlayers; i++) {
 		trElements[i] = document.createElement("tr");
 		for (var j = 0; j < 3; j++) {
@@ -182,7 +186,6 @@ function uploadWAV(url, blob) {
 		saveElements[i].innerHTML = "Save";
 		if ( playerlist[i] == username ) {
 			tdElements[i * 3 + 1].appendChild( progressElement );
-			saveElements[i].href = url;
 			tdElements[i * 3 + 2].appendChild( saveElements[i] );
 		} else {
 			saveElements[i].href = "tmp/" + sessionID + "_" + playerlist[i] + ".wav";
@@ -190,17 +193,24 @@ function uploadWAV(url, blob) {
 		}
 		tableElement.appendChild( trElements[i] );
 	}
+	wrapper.style.display = "";
+}
 
+function uploadWAV(url, blob) {
+	for (var i = 0; i < numPlayers; i++) {
+		if ( playerlist[i] == username ) {
+			saveElements[i].href = url;
+			break;
+		}
+	}
 	var uploadRequest = new XMLHttpRequest();
 	uploadRequest.open( "POST", "upload.php", true );
 	uploadRequest.setRequestHeader( "BAND_ID", sessionID );
 	uploadRequest.setRequestHeader( "USERNAME", username );
-	uploadRequest.upload.addEventListener( "progress",
-		function (e) {
+	uploadRequest.upload.onprogress = function (e) {
 			var percent = Math.round( e.loaded / e.total * 100 );
 			progressElement.value = percent;
-		},
-		false );
+		};
 	uploadRequest.onreadystatechange = function() {
 		if (uploadRequest.readyState == 4) {
 			if (uploadRequest.status != 200)
@@ -211,7 +221,6 @@ function uploadWAV(url, blob) {
 			}
 		}
 	};
-//	uploadRequest.send( wavData );
 	uploadRequest.send( blob );
 
 	var getFileStatusRequests = new Array();
@@ -260,7 +269,6 @@ function uploadWAV(url, blob) {
 
 	var checkAllFinished = function() {
 		for ( var i = 0; i < getFileStatusRequests.length; i++ ) {
-			console.log( i + ": " + getFileStatusRequests[i].finished );
 			if ( !getFileStatusRequests[i].finished )
 				return;
 		}
