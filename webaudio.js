@@ -5,17 +5,64 @@ var recorder;
 var time;
 var waitAck;
 var playerlist;
-var username;
-var isAdmin;
-var wrapper;
-var bglayer;
-var promptlayer;
 
-function initAudio( currentSessionID, my_username, isadmin ) {
+// For showing audio streams
+var audioStreamTable;
+var audioStreamTr;
+var audioStreamTd;
+var audioStreamOK;
+var showAudioStreams;
+
+// For showing mixing results
+var progressElement;
+var saveElements;
+var mixPElement;
+var numPlayers;
+
+function initAudio( currentSessionID ) {
 	sessionID = currentSessionID;
-	username = my_username;
-	isAdmin = isadmin;
 	location.hash = "#" + sessionID;
+
+	showAudioStream = false;
+	audioStreamTable = document.createElement( "table" );
+	audioStreamTable.width = "90%";
+	audioStreamTable.border = "0";
+	audioStreamTable.align = "center";
+	audioStreamTable.style.display = "none";
+	audioStreamTr = new Array();
+	audioStreamTd = new Array();
+	var audioTdWidth = [ "30%", "60%" ];
+	var audioAlign = [ "right", "center" ];
+	for (var i = 0; i < 4; i++) {
+		audioStreamTr[i] = document.createElement( "tr" );
+		if ( i != 3 ) {
+			for (var j = 0; j < 2; j++) {
+				audioStreamTd[i * 2 + j] = document.createElement( "td" );
+				audioStreamTd[i * 2 + j].width = audioTdWidth[j];
+				audioStreamTd[i * 2 + j].align = audioAlign[j];
+				audioStreamTr[i].appendChild( audioStreamTd[i * 2 + j] );
+			}
+		} else {
+			audioStreamTd[i * 2] = document.createElement( "td" );
+			audioStreamTd[i * 2].colSpan = "2";
+			audioStreamTd[i * 2].align = "center";
+			audioStreamTr[i].appendChild( audioStreamTd[i * 2] );
+		}
+		audioStreamTable.appendChild( audioStreamTr[i] );
+	}
+	audioStreamTd[0].innerHTML = "<b>Local Audio Stream: </b>";
+	audioStreamTd[1].innerHTML = "<i>Loading...</i>";
+	audioStreamTd[2].innerHTML = "<b>Remote Audio Streams: </b>";
+	audioStreamTd[3].innerHTML = "<i>Loading...</i>";
+	audioStreamTd[4].innerHTML = "&nbsp;";
+	audioStreamTd[5].innerHTML = "&nbsp;";
+	audioStreamOK = document.createElement("a");
+	audioStreamOK.href = "javascript: toggleAudioStreams();";
+	audioStreamOK.innerHTML = "OK";
+	audioStreamTd[6].appendChild( audioStreamOK );
+	
+	promptlayer.appendChild( audioStreamTable );
+
 	connection = new RTCMultiConnection();
 	connection.autoCloseEntireSession = true;
 	connection.session = 'audio and data';
@@ -29,50 +76,45 @@ function initAudio( currentSessionID, my_username, isadmin ) {
 			var mediaElement = stream.mediaElement;
 
 			if (stream.direction !== RTCDirection.OneWay) {
-				var remoteMediaStreams = document.getElementById('remote-media-streams');
-				remoteMediaStreams.insertBefore(mediaElement, remoteMediaStreams.firstChild);
-			} else
-				document.getElementById('local-media-stream').appendChild(mediaElement);
+				audioStreamTd[3].innerHTML = "";
+				audioStreamTd[3].appendChild( mediaElement );
+			} else {
+				audioStreamTd[1].innerHTML = "";
+				audioStreamTd[1].appendChild( mediaElement );
+			}
 			
 			mediaElement.controls = true;
-
-			var loadingRemoteElement = document.getElementById('loading_remote');
-			loadingRemoteElement.style.display = "none";
-
 		} 
 		
 		if (stream.type === 'local') {
 			mediaElement = stream.mediaElement;
-			document.getElementById('local-media-stream').appendChild(mediaElement);
+			audioStreamTd[1].innerHTML = "";
+			audioStreamTd[1].appendChild( mediaElement );
 			mediaElement.controls = true;
 
 			recorder = RecordRTC({
 			    stream: stream.stream
 			});
-
-			var loadingLocalElement = document.getElementById('loading_local');
-			loadingLocalElement.style.display = "none";
 		}
 	};
+}
 
-	// DOM for prompt layer and background layer
-	wrapper = document.createElement("div");
-	wrapper.id = "wrapper";
-	document.body.appendChild( wrapper );
-
-	bglayer = document.createElement("div");
-	bglayer.id = "bglayer";
-	wrapper.appendChild( bglayer );
-
-	promptlayer = document.createElement("div");
-	promptlayer.id = "promptlayer";
-	wrapper.appendChild( promptlayer );
-
-	wrapper.style.display = "none";
-	setPromptLayer();
-	window.addEventListener( "resize", setPromptLayer, false );
-	window.addEventListener( "scroll", setPromptLayer, false );
-
+function toggleAudioStreams() {
+	if ( !loaded )
+		return;
+	if ( showAudioStreams ) {
+		// Turn Off
+		audioStreamTable.style.display = "none";
+		wrapper.style.display = "none";
+	} else {
+		// Turn on
+		h2Element.innerHTML = "Audio Streams";
+		audioStreamTable.style.display = "";
+		promptlayer.myHeight = undefined;
+		setPromptLayer();
+		wrapper.style.display = "";
+	}
+	showAudioStreams = !showAudioStreams;
 }
 
 function messageMux( message ) {
@@ -96,20 +138,6 @@ function messageMux( message ) {
 	}
 }
 
-function setPromptLayer( e ) {
-	var width = document.body.clientWidth ? document.body.clientWidth : window.innerWidth;
-	var height = document.body.clientHeight ? document.body.clientHeight : window.innerHeight;
-	bglayer.style.width = width;
-	bglayer.style.height = height;
-	bglayer.style.left = window.pageXOffset;
-	bglayer.style.top = window.pageYOffset;
-
-	promptlayer.style.width = width * 0.5;
-	promptlayer.style.height = height * 0.5;
-	promptlayer.style.left = window.pageXOffset + Math.round( (width - width * 0.5) / 2 );
-	promptlayer.style.top = window.pageYOffset + Math.round( (height - height * 0.5) / 2 );
-}
-
 function openSession() {
     var sessionid = location.hash.replace('#', '');
 	connection.open( sessionid );
@@ -120,8 +148,11 @@ function joinSession() {
 	connection.connect( sessionid );
 };
 
-function startRecorder( playerList ) {
-	playerlist = playerList;
+function startRecorder() {
+	recordButtonElement.className = "stopButton";
+	recordTextElement.innerHTML = "Stop";
+	recordTextElement.className = "stopRecordText";
+	recordTextElement.href = "javascript: stopRecorder();";
 	if (isAdmin) {
 		var timer = new Date();
 		time = timer.getTime();
@@ -134,25 +165,18 @@ function startRecorder( playerList ) {
 	}
 }
 
-var h1Element;
-var progressElement;
-var tableElement;
-var trElements;
-var tdElements;
-var saveElements;
-var tdWidth;
-var tdAlign;
-var numPlayers;
 
 function stopRecorder() {
+	recordButtonElement.className = "startButton";
+	recordTextElement.innerHTML = "Record";
+	recordTextElement.className = "startRecordText";
+	recordTextElement.href = "javascript: startRecorder();";
 	if (isAdmin)
 		connection.send( 'end' );
 	recorder.stopAudio( uploadWAV );
 	
 	/* DOM Manipulation */
-	h1Element = document.createElement("h2");
-	h1Element.innerHTML = "Uploading to the server for mixing...";
-	promptlayer.appendChild( h1Element );
+	h2Element.innerHTML = "Uploading to the server for mixing...";
 	
 	progressElement = document.createElement( "progress" );
 	progressElement.max = 100;
@@ -273,10 +297,15 @@ function uploadWAV(url, blob) {
 				return;
 		}
 
-		var mixPElement = document.createElement("p");
+		mixPElement = document.createElement("p");
 		mixPElement.align = "center";
 		mixPElement.innerHTML = "Mixing your song...";
 		promptlayer.appendChild( mixPElement );
+		
+		okPElement = document.createElement("p");
+		okPElement.align = "center";
+		okPElement.innerHTML = "<a href=\"javascript:disablePrompt();\">OK</a>";
+		promptlayer.appendChild( okPElement );
 		var mixRequest = new XMLHttpRequest();
 		mixRequest.onreadystatechange = function() {
 			if ( mixRequest.readyState == 4 ) {
@@ -309,4 +338,30 @@ function uploadWAV(url, blob) {
 		mixRequest.open( "GET", "mix.php", true );
 		mixRequest.send();
 	}
+}
+
+function disablePrompt() {
+	promptlayer.removeChild( tableElement );
+	promptlayer.removeChild( mixPElement );
+	promptlayer.removeChild( okPElement );
+	for ( var i = 0; i < numPlayers; i++ ) {
+		if ( playerlist[i] == username )
+			tdElements[i * 3 + 1].removeChild( progressElement );
+		tdElements[i * 3 + 2].removeChild( saveElements[i] );
+		for ( var j = 0; j < 3; j++ ) {
+			trElements[i].removeChild( tdElements[i * 3 + j] );
+		}
+		tableElement.removeChild( trElements[i] );
+	}
+	wrapper.style.display = "none";
+	progressElement = undefined;
+	tableElement = undefined;
+	trElements = undefined;
+	tdElements = undefined;
+	saveElements = undefined;
+	mixPElement = undefined;
+	okPElement = undefined;
+	tdWidth = undefined;
+	tdAlign = undefined;
+	numPlayers = undefined;
 }

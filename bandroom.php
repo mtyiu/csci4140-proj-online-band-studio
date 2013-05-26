@@ -261,6 +261,15 @@
 								
 								mysql_select_db("prjband", $conn);
 								
+								$result = mysql_query("SELECT * FROM music_info WHERE band_id = $band_id");
+								$row = mysql_fetch_array($result);
+								
+								if ( $row["band_id"] == "" ) {
+									mysql_query("INSERT INTO music_info VALUES ('$band_id', 'Untitled', 'N/A', 120, 'C')");
+									$result = mysql_query("SELECT * FROM music_info WHERE band_id = '$band_id'");
+									$row = mysql_fetch_array($result);
+								}
+								
 								if (_post("song_name") != "" || _post("author") != "" || _post("tempo") != "" || _post("key") != "") {
 									$song_name = _post("song_name");
 									$author = _post("author");
@@ -281,7 +290,6 @@
 								$row = mysql_fetch_array($result);
 								
 								if ( $row["band_id"] == "" ) {
-									echo "<script>console.log('insert');</script>";
 									mysql_query("INSERT INTO music_info VALUES ('$band_id', 'Untitled', 'N/A', 120, 'C')");
 									$result = mysql_query("SELECT * FROM music_info WHERE band_id = '$band_id'");
 									$row = mysql_fetch_array($result);

@@ -45,13 +45,11 @@
 		$paths[$i] = sprintf( "%s/%s_%s.wav", $TMP_DIR, $row['band'], $row['user'] );
 		$vols[$i] = intval( $row['volume'] );
 		$pans[$i] = intval( $row['pan'] );
-		$volsum += $vols[$i];
 		$i++;
 		$numChannels++;
 	}
 
 	for ( $i = 0; $i < $numChannels; $i++ ) {
-		$vols[$i] = round( $vols[$i] / $volsum * 100 );
 		$tmp_command = sprintf( "-a:%d -i %s -ea:%d -epp:%d \\\n", ($i + 1), $paths[$i], $vols[$i], $pans[$i] );
 		$command = $command . $tmp_command;
 	}
