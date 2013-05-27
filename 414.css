@@ -157,6 +157,7 @@ td.mainon{
 #bandtitle {
 	width: 90%;
 	max-width: 1200px;
+	height: 140px;
 	background: rgba(100%,100%,100%,0.8);
 	margin: 10px;
 	margin-left: auto;
@@ -196,6 +197,71 @@ h1 {
 h2 {
 	width: 90%;
 	font-size: 20px;
+}
+#music_sheet_wrapper {
+	width: 90%;
+	max-width: 1200px;
+	background: rgba(0%,0%,0%,0.6);
+	margin: 10px;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 15px;
+	border-radius: 15px;
+	border-style: solid;
+	border-color: #FFF;
+	display: table;
+	box-shadow: 4px 4px 20px 4px rgba(0%,0%,0%,0.4);
+}
+#music_sheet {
+	text-align: center;
+	vertical-align: middle;
+	display: table-cell;
+	color: #DDD;
+}
+.musicSheetLink:link {
+	color: #777;
+}
+.musicSheetLink:visited {
+	color: #777;
+}
+.musicSheetLink:active {
+	color: #FFF;
+}
+.musicSheetLink:hover {
+	color: #FFF;
+}
+#fileDragDrop {
+	font-weight: bold;
+	text-align: center;
+	padding: 1em 0;
+	margin: 1em 0;
+	margin-left: auto;
+	margin-right: auto;
+	border: 2px dashed #555555;
+	border-radius: 10px;
+	width: 200px;
+	background-color: #333;
+}
+#fileDragDrop.hover {
+	color: #FF0000;
+	border-style: solid;
+	border-color: #FF0000;
+}
+.nextPrevButton {
+	font-weight: bold;
+	text-align: center;
+	font-size: 14px;
+	width: 40px;
+	color: #888;
+}
+.nextPrevButtonHover {
+	font-weight: bold;
+	text-align: center;
+	font-size: 14px;
+	width: 40px;
+	cursor: pointer;
+	color: #FFF;
+	background-color: rgba( 100%, 100%, 100%, 0.5 );
 }
 .startButton {
 	display: block;

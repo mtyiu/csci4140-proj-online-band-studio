@@ -26,6 +26,7 @@
     <link rel="stylesheet" type="text/css" href="414.css">
 
 	<script type="text/javascript" src="bandroom.js"></script>
+	<script type="text/javascript" src="music_sheet.js"></script>
 	<script type="text/javascript" src="firebase.js"></script>
 	<script type="text/javascript" src="RTCMultiConnection-v1.2.js"></script>
 	<script type="text/javascript" src="RecordRTC.js"></script>
@@ -94,7 +95,14 @@
 	<!-- HEADER END -->
 
 	<!-- MUSIC SHEET START -->
-	
+	<div id="music_sheet_wrapper">
+		<div id="music_sheet">
+			<div id="oops_music_sheet">
+				<p>Oops! You didn't upload your music sheet!</p><a href="javascript: setUploadForm();" id="uploadMusicSheetLink" class="musicSheetLink" style="font-size: 20pt;">Upload Music Sheet</a>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">initMusicSheet();</script>
 	<!-- MUSIC SHEET END -->
 	
 	<!-- FOOTER START -->

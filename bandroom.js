@@ -24,7 +24,7 @@ var loaded;
 function initBandRoom( bandid ) {
 	bandId = bandid;
 	metronome = false;
-	autoflip = false;
+	autoflip = 0;
 	element = new Array();
 	elementList = [ "song_title", "song_author", "song_tempo", "song_key",
 					"adminName", "player1Name", "player2Name", "player3Name" ];
@@ -34,7 +34,7 @@ function initBandRoom( bandid ) {
 	recordTextElement = document.getElementById( "recordText" );
 	recordButtonElement = document.getElementById( "recordStartStop" );
 
-	updateItv = window.setInterval( update, 1000 );
+	updateItv = window.setInterval( function() { update(false); }, 1000 );
 	preparePromptLayer();
 	initAudio( bandid );
 	if ( isAdmin ) {
@@ -388,6 +388,8 @@ function toggleMetronome() {
 
 function update( sync ) {
 	var xhr = new XMLHttpRequest();
+	xhr.open( "GET", "getInfo.php?band_id=" + bandId, !sync );
+	xhr.send();
 	xhr.onreadystatechange = function() {
 		if (xhr.readyState == 4) {
 			if ( xhr.status != 200 )
@@ -412,7 +414,5 @@ function update( sync ) {
 			}
 		}
 	}
-	xhr.open( "GET", "getInfo.php?band_id=" + bandId, sync ? false : true );
-	xhr.send();
 }
 
