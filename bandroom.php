@@ -65,8 +65,8 @@
 			<td width="50"><p align="left" id="song_tempo"><?php echo $row["tempo"]; ?></td>
 			<td width="50"><p align="right"><b>Key: </b></p></td>
 			<td width="50"><p align="left" id="song_key"><?php echo $row["song_key"]; ?></td>
-			<td width="50"><p align="center"><a href="javascript:editSongInfo();">Edit</a></p></td>
-			<td width="100"><p align="right"><a href="javascript: leaveBandRoom();">Leave Room</a></p></td>
+			<td width="50"><p align="center" class="jslink" onclick="editSongInfo();">Edit</p></td>
+			<td width="100"><p align="right" class="jslink" onclick=" leaveBandRoom();">Leave Room</p></td>
 			</tr>
 		</table>
 		<?php
@@ -103,7 +103,7 @@
 	<div id="music_sheet_wrapper">
 		<div id="music_sheet">
 			<div id="oops_music_sheet">
-				<p>Oops! You didn't upload your music sheet!</p><a href="javascript: setUploadForm();" id="uploadMusicSheetLink" class="musicSheetLink" style="font-size: 20pt;">Upload Music Sheet</a>
+				<p>Oops! You didn't upload your music sheet!</p><p onclick="setUploadForm();" id="uploadMusicSheetLink" class="musicSheetLink" style="font-size: 20pt;">Upload Music Sheet</p>
 			</div>
 		</div>
 	</div>
@@ -136,10 +136,10 @@
 		<table id="footerTable">
 			<tr>
 			<td width="40"><b id="recordStartStop" class="startButton"></b></td>
-			<td width="15%"><a href="javascript:startRecorder();" id="recordText" class="startRecordText">Record</a></td>
-			<td><p align="center"><a href="javascript:toggleAudioStreams();">View All Audio Streams</a></p></td>
-			<td id="mixer"><b><a href="javascript: showMixer();">Mixer</a></b></td>
-			<td id="musicsheetedit"><a href="javascript: setUploadForm();">Edit Music Sheet</a></td>
+			<td width="15%"><p id="recordText" class="startRecordText">Record</p></td>
+			<td><p align="center" class="jslink" onclick="toggleAudioStreams();">View All Audio Streams</p></td>
+			<td id="mixer"><p class="jslink" onclick="showMixer();">Mixer</p></td>
+			<td id="musicsheetedit"><p class="jslink" onclick="setUploadForm();">Edit Music Sheet</p></td>
 			<td id="autoflip"><b>Auto flip:</b>&nbsp;<font id="autoflip_s"><i>Disabled</i></font> </td>
 			<td id="chatroomButton"><b>Chatroom(<span id="onlineCount">1</span>)</b></td>
 			</tr>

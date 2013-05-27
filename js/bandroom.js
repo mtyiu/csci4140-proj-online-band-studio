@@ -47,6 +47,9 @@ function initBandRoom( bandid ) {
 
 function leaveBandRoom() {
 	if ( !left ) {
+		if ( isAdmin )
+			connection && connection.send( "exit" );
+		connection.leave();
 		var xhr = new XMLHttpRequest();
 		xhr.open( "POST", "exitRoom.php", false );
 		xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -205,6 +208,7 @@ function showMixer() {
 	}
 	var xhr = new XMLHttpRequest();
 	xhr.open( "GET", "getMixerConfig.php?band_id=" + bandId.toString(), false );
+	xhr.setRequestHeader( "If-Modified-Since", (new Date(0)).toGMTString() );
 	xhr.send();
 	if (xhr.readyState == 4) {
 		if ( xhr.status != 200 )
@@ -229,7 +233,7 @@ function showMixer() {
 
 	okPElement = document.createElement("p");
 	okPElement.align = "center";
-	okPElement.innerHTML = "<a href=\"javascript:submitMixerConfig();\">Submit</a>&nbsp;&nbsp;&nbsp;<a href=\"javascript:hideMixer();\">Cancel</a>";
+	okPElement.innerHTML = "<span onclick=\"submitMixerConfig();\" class=\"jslink\">Submit</span>&nbsp;&nbsp;&nbsp;<span onclick=\"hideMixer();\" class=\"jslink\">Cancel</span>";
 	promptlayer.appendChild( okPElement );
 
 	promptlayer.myHeight = "400px";
@@ -258,7 +262,7 @@ function submitMixerConfig() {
 			if ( xhr.responseText == "OK" ) {
 				hideMixer();
 			} else {
-				okPElement.innerHTML = "<p><font color=red><b>[Error] " + xhr.responseText + "</b></font></p>" + "<a href=\"javascript:cancelSongInfo();\">Cancel</a>";
+				okPElement.innerHTML = "<p><font color=red><b>[Error] " + xhr.responseText + "</b></font></p>" + "<p onclick=\"cancelSongInfo();\" class=\"jslink\">Cancel</p>";
 			}
 		}
 	}
@@ -339,7 +343,7 @@ function editSongInfo() {
 
 	okPElement = document.createElement("p");
 	okPElement.align = "center";
-	okPElement.innerHTML = "<a href=\"javascript:submitSongInfo();\">Submit</a>&nbsp;&nbsp;&nbsp;<a href=\"javascript:cancelSongInfo();\">Cancel</a>";
+	okPElement.innerHTML = "<span onclick=\"submitSongInfo();\" class=\"jslink\">Submit</span>&nbsp;&nbsp;&nbsp;<span onclick=\"cancelSongInfo();\" class=\"jslink\">Cancel</span>";
 	promptlayer.appendChild( okPElement );
 
 	promptlayer.myHeight = "280px";
@@ -368,7 +372,7 @@ function submitSongInfo() {
 				}
 				cancelSongInfo();
 			} else {
-				okPElement.innerHTML = "<p><font color=red><b>[Error] " + xhr.responseText + "</b></font></p>" + "<a href=\"javascript:cancelSongInfo();\">Cancel</a>";
+				okPElement.innerHTML = "<p><font color=red><b>[Error] " + xhr.responseText + "</b></font></p>" + "<span onclick=\"cancelSongInfo();\" id=\"jslink\">Cancel</a>";
 			}
 		}
 	}
@@ -394,8 +398,10 @@ function cancelSongInfo() {
 
 function update( sync ) {
 	var xhr = new XMLHttpRequest();
-	xhr.open( "GET", "getInfo.php?band_id=" + bandId, !sync );
-	xhr.send();
+	var url = "getInfo.php?band_id=" + bandId.toString();
+	xhr.open( "GET", url, !sync );
+	xhr.setRequestHeader( "If-Modified-Since", (new Date(0)).toGMTString() );
+	xhr.send(null);
 	xhr.onreadystatechange = function() {
 		if (xhr.readyState == 4) {
 			if ( xhr.status != 200 )
@@ -420,6 +426,6 @@ function update( sync ) {
 				element[ elementList[8] ].innerHTML = playerlist.length.toString();
 			}
 		}
-	}
+	};
 }
 

@@ -21,6 +21,17 @@ a:active {
 a:hover {
 	color: #AAA;
 }
+.jslink {
+	color: #222;
+	cursor: pointer;
+	text-decoration: underline;
+}
+.jslink:active {
+	color: #AAA;
+}
+.jslink:hover {
+	color: #AAA;
+}
 #top_banner {
 	width: 800px;
 	height: 250px;
@@ -156,11 +167,10 @@ h2 {
 	display: table-cell;
 	color: #DDD;
 }
-.musicSheetLink:link {
+.musicSheetLink {
 	color: #777;
-}
-.musicSheetLink:visited {
-	color: #777;
+	cursor: pointer;
+	text-decoration: underline;
 }
 .musicSheetLink:active {
 	color: #FFF;
@@ -219,9 +229,25 @@ h2 {
 }
 .startRecordText {
 	color: #B00000;
+	cursor: pointer;
+	text-decoration: underline;
+}
+.startRecordText:active {
+	color: #E00000;
+}
+.startRecordText:hover {
+	color: #E00000;
 }
 .stopRecordText {
 	color: #222;
+	cursor: pointer;
+	text-decoration: underline;
+}
+.stopRecordText:active {
+	color: #888;
+}
+.stopRecordText:hover {
+	color: #888;
 }
 #footer-container {
 	width: 100%;

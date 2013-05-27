@@ -11,8 +11,11 @@
 	$file["name"] = sprintf("%s_%s.wav", $_SERVER['HTTP_BAND_ID'], $_SERVER['HTTP_USERNAME']);
 	$file["size"] = strlen( $data );
 
-	// Write file contents into a temporary file
 	$tmp_filepath = sprintf( "%s/%s", $TMP_DIR, $file["name"] );
+	if ( file_exists( $tmp_filepath ) )
+		unlink( $tmp_filepath );
+
+	// Write file contents into a temporary file
 	file_put_contents( $tmp_filepath, $data );
 
 	echo "File uploaded $tmp_filepath.";

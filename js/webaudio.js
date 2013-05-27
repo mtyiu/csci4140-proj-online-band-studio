@@ -56,20 +56,19 @@ function initAudio( currentSessionID ) {
 	audioStreamTd[3].innerHTML = "<i>Loading...</i>";
 	audioStreamTd[4].innerHTML = "&nbsp;";
 	audioStreamTd[5].innerHTML = "&nbsp;";
-	audioStreamOK = document.createElement("a");
-	audioStreamOK.href = "javascript: toggleAudioStreams();";
+	audioStreamOK = document.createElement("span");
+	audioStreamOK.className = "jslink";
+	audioStreamOK.onclick = toggleAudioStreams;
 	audioStreamOK.innerHTML = "OK";
 	audioStreamTd[6].appendChild( audioStreamOK );
 	
 	promptlayer.appendChild( audioStreamTable );
 
 	connection = new RTCMultiConnection();
-	connection.autoCloseEntireSession = true;
+	connection.autoCloseEntireSession = false;
 	connection.session = 'audio and data';
 	connection.onmessage = messageMux;
-	connection.onleave = function( userid, extra ) {
-		if (!isAdmin) leaveBandRoom();
-	};
+	connection.onclose = leaveBandRoom;
 	connection.onstream = function (stream) {
 		if (stream.type === 'remote') {
 			var mediaElement = stream.mediaElement;
@@ -90,12 +89,14 @@ function initAudio( currentSessionID ) {
 			audioStreamTd[1].innerHTML = "";
 			audioStreamTd[1].appendChild( mediaElement );
 			mediaElement.controls = true;
-
 			recorder = RecordRTC({
 			    stream: stream.stream
 			});
 		}
 	};
+
+	if ( isAdmin )
+		document.getElementById( "recordText" ).onclick = startRecorder;
 }
 
 function toggleAudioStreams() {
@@ -120,15 +121,22 @@ function messageMux( message ) {
 	console.log( "Message received: " + message );
 	switch( message ) {
 		case "start":
+			connection.send( 'ack' );
+			startRecorder();
+			break;
 		case "end":
 			connection.send( 'ack' );
-			start_record();
+			stopRecorder();
 			break;
 		case "ack":
 			if ( waitAck ) {
 				recordTimeoutHandler();
 			}
 			waitAck = false;
+			break;
+		case "exit":
+			if ( !isAdmin )
+				leaveBandRoom();
 			break;
 		default:
 			if ( message.substr( 0, 4 ) == "CHAT" ) {
@@ -153,14 +161,15 @@ function startRecorder() {
 	recordButtonElement.className = "stopButton";
 	recordTextElement.innerHTML = "Stop";
 	recordTextElement.className = "stopRecordText";
-	recordTextElement.href = "javascript: stopRecorder();";
 	if (isAdmin) {
+		recordTextElement.onclick = stopRecorder;
 		connection.send( 'start' );
 		if ( playerlist.length > 1 )
 			waitAck = true;
 		else
 			recordTimeoutHandler();
 	} else {
+		recordTextElement.onclick = function (e) {};
 		recordTimeoutHandler();
 	}
 }
@@ -194,9 +203,10 @@ function stopRecorder() {
 	recordButtonElement.className = "startButton";
 	recordTextElement.innerHTML = "Record";
 	recordTextElement.className = "startRecordText";
-	recordTextElement.href = "javascript: startRecorder();";
-	if (isAdmin)
+	if (isAdmin) {
+		recordTextElement.onclick = startRecorder;
 		connection.send( 'end' );
+	}
 	recorder.stopAudio( uploadWAV );
 	
 	/* DOM Manipulation */
@@ -243,7 +253,7 @@ function stopRecorder() {
 	}
 	okPElement = document.createElement("p");
 	okPElement.align = "center";
-	okPElement.innerHTML = "<a href=\"javascript:disablePrompt();\">OK</a>";
+	okPElement.innerHTML = "<span onclick=\"disablePrompt();\" class=\"jslink\">OK</span>";
 	promptlayer.appendChild( okPElement );
 	wrapper.style.display = "";
 }
@@ -256,7 +266,7 @@ function uploadWAV(url, blob) {
 		}
 	}
 	var uploadRequest = new XMLHttpRequest();
-	uploadRequest.open( "POST", "upload.php", true );
+	uploadRequest.open( "POST", "upload.php", false );
 	uploadRequest.setRequestHeader( "BAND_ID", sessionID );
 	uploadRequest.setRequestHeader( "USERNAME", username );
 	uploadRequest.upload.onprogress = function (e) {
@@ -308,6 +318,7 @@ function uploadWAV(url, blob) {
 				return function( e ) {
 					if ( !req.finished ) {
 						req.open( "GET", req.url, true );
+						req.setRequestHeader( "If-Modified-Since", (new Date(0)).toGMTString() );
 						req.send();
 					}
 					if ( req.finished )
@@ -315,6 +326,7 @@ function uploadWAV(url, blob) {
 				}
 			}(), 1000 );
 		request.open( "GET", request.url, true );
+		request.setRequestHeader( "If-Modified-Since", (new Date(0)).toGMTString() );
 		request.send();
 		getFileStatusRequests.push( request );
 	}
@@ -352,6 +364,7 @@ function uploadWAV(url, blob) {
 					return function( e ) {
 						if ( !req.finished ) {
 							req.open( "GET", "mix.php", true );
+							req.setRequestHeader( "If-Modified-Since", (new Date(0)).toGMTString() );
 							req.send();
 						}
 						if ( req.finished )
@@ -360,6 +373,7 @@ function uploadWAV(url, blob) {
 				}(), 1000 );
 		}
 		mixRequest.open( "GET", "mix.php", true );
+		mixRequest.setRequestHeader( "If-Modified-Since", (new Date(0)).toGMTString() );
 		mixRequest.send();
 	}
 }

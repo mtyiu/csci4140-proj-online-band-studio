@@ -64,11 +64,10 @@ function initMusicSheet() {
 	autoFlipInputElement.unit = "ms";
 	autoFlipPElement.appendChild( autoFlipInputElement );
 	autoFlipPElement.appendChild( document.createTextNode( "  " ) );
-	var autoFlipAUnitElement = document.createElement( "a" );
-	autoFlipAUnitElement.innerHTML = "ms";
-	autoFlipAUnitElement.className = "musicSheetLink";
-	autoFlipAUnitElement.href = "javascript:;";
-	autoFlipAUnitElement.onclick = function ( e ) {
+	var autoFlipSpanUnitElement = document.createElement( "span" );
+	autoFlipSpanUnitElement.innerHTML = "ms";
+	autoFlipSpanUnitElement.className = "musicSheetLink";
+	autoFlipSpanUnitElement.onclick = function ( e ) {
 		if ( e.target.innerHTML == "ms" ) {
 			e.target.innerHTML = "bar";
 			autoFlipInputElement.unit = "bar";
@@ -77,10 +76,10 @@ function initMusicSheet() {
 			autoFlipInputElement.unit = "ms";
 		}
 	}
-	autoFlipPElement.appendChild( autoFlipAUnitElement );
+	autoFlipPElement.appendChild( autoFlipSpanUnitElement );
 	autoFlipPElement.appendChild( document.createTextNode( "\u00A0\u00A0\u00A0" ) );
-	var autoFlipSetElement = document.createElement( "a" );
-	autoFlipSetElement.href = "javascript: setAutoFlipInterval();";
+	var autoFlipSetElement = document.createElement( "span" );
+	autoFlipSetElement.onclick = setAutoFlipInterval;
 	autoFlipSetElement.innerHTML = "Set";
 	autoFlipSetElement.className = "musicSheetLink";
 	autoFlipPElement.appendChild( autoFlipSetElement );
@@ -117,7 +116,7 @@ function initMusicSheet() {
 	fileInputElement.addEventListener( "change", fileSelectHandler, false );
 	
 	var musicSheetOKPElement = document.createElement( "p" );
-	musicSheetOKPElement.innerHTML = "<a href=\"javascript: confirmMusicSheetUpload(); setAutoFlipInterval();\" class=\"musicSheetLink\">OK</a>&nbsp;&nbsp;<a href=\"javascript: cancelMusicSheetUpload();\" class=\"musicSheetLink\">Cancel</a>";
+	musicSheetOKPElement.innerHTML = "<span onclick=\"confirmMusicSheetUpload(); setAutoFlipInterval();\" class=\"musicSheetLink\">OK</span>&nbsp;&nbsp;<span onclick=\"cancelMusicSheetUpload();\" class=\"musicSheetLink\">Cancel</span>";
 	musicSheetUploadFormDiv.appendChild( musicSheetOKPElement );
 
 	/* Construct music sheet display layer */
@@ -219,8 +218,10 @@ function setMusicSheetLayer( e ) {
 function setUploadForm() {
 	fileChanged = false;
 	musicSheetOopsDiv.style.display = "none";
-	if ( musicSheetDisplayDiv.displaying )
+	if ( musicSheetDisplayDiv.displaying ) {
 		musicSheetDiv.removeChild( musicSheetDisplayDiv );
+		musicSheetDisplayDiv.displaying = false;
+	}
 	musicSheetDiv.appendChild( musicSheetUploadFormDiv );
 }
 
@@ -273,6 +274,11 @@ function confirmMusicSheetUpload() {
 }
 
 function cancelMusicSheetUpload() {
-	musicSheetOopsDiv.style.display = "";
 	musicSheetDiv.removeChild( musicSheetUploadFormDiv );
+	if ( !fileChanged && fileList.length > 0 ) {
+		musicSheetDiv.appendChild( musicSheetDisplayDiv );
+		musicSheetDisplayDiv.displaying = true;
+	} else {
+		musicSheetOopsDiv.style.display = "";
+	}
 }

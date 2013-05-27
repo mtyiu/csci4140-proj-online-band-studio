@@ -34,6 +34,10 @@
 		// Update mixer
 		$sql = "INSERT INTO mixer VALUES ($id, '$login_session', 50, 50)";
 		$result = mysql_query( $sql );
+		
+		// Update music_info
+		$sql = "INSERT INTO music_info VALUES ($id, 'Untited', 'N/A', 100, 'C')";
+		$result = mysql_query( $sql );
 	}
 ?>
 
