@@ -2,6 +2,8 @@
 	include( "config.php" );
 	session_start();
 	
+	$error = "";
+
 	// Check if a session already exist
 	if ( isset( $_SESSION['login_user'] ) ) {
 		$user_check = $_SESSION['login_user'];
@@ -17,25 +19,24 @@
 		// username and password sent from Form 
 		$myusername = addslashes( $_POST[ 'username' ] );
 		$mypassword = addslashes( $_POST[ 'password' ] );
+		$mypasswordConfirm = addslashes( $_POST[ 'passwordConfirm' ] );
 		$tbl_name = "acct";
-		$sql = "SELECT * FROM $tbl_name WHERE user='$myusername' and pass='$mypassword'";
+		$sql = "SELECT * FROM $tbl_name WHERE user='$myusername'";
 		$result = mysql_query( $sql );
-		$row = mysql_fetch_array( $result );
-		$active = $row[ 'active' ];
-		$count = mysql_num_rows( $result );
-		
-		
-		// If result matched $myusername and $mypassword, table row must be 1 row
-		if ( $count == 1 ) {
-			session_register( "myusername" );
-			$_SESSION[ 'login_user' ] = $myusername;
-			
-			header( "location: welcome.php" );
-		} else {
-			$error = "Invalid password or user name";
+		if ( $row = mysql_fetch_array( $result ) )
+			$error = "The account is already registered.";
+		else if ( $mypassword != $mypasswordConfirm )
+			$error = "The input passwords do not match with each other.";
+		else {
+			// Everything seems okay.
+			$sql = "SELECT COUNT(*) AS count FROM acct";
+			$result = mysql_query( $sql );
+			$row = mysql_fetch_array( $result );
+			$id = $row[ "count" ] + 1;
+			$sql = "INSERT INTO acct VALUES ($id, '$myusername', '$mypassword', 0)";
+			mysql_query( $sql );
+			echo "<script type=\"text/javascript\">alert(\"Account registered. Please login!\"); window.location.assign(\"index.php\");</script>";
 		}
-	} else {
-		$error = "";
 	}
 ?>
 <html>
@@ -58,7 +59,7 @@
 
 								<table width="100%" border="0" cellpadding="3" cellspacing="1">
 									<tr>
-										<td colspan="3"><strong>Member Login</strong>
+										<td colspan="3"><strong>Registration</strong>
 										</td>
 									</tr>
 									<tr>
@@ -76,13 +77,16 @@
 										</td>
 									</tr>
 									<tr>
-										<td colspan="3" align="center">
-											<input type="submit" name="Submit" value="Login">
+										<td>Confirm Password</td>
+										<td>:</td>
+										<td>
+											<input name="passwordConfirm" type="password">
 										</td>
 									</tr>
 									<tr>
 										<td colspan="3" align="center">
-											<a href="register.php" class="musicSheetLink">Register</a>
+											<input type="submit" name="submit" value="Register">
+											<input type="button" value="Cancel" onclick="javascript: window.location.assign('index.php');">
 										</td>
 									</tr>
 								</table>
