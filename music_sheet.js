@@ -8,7 +8,10 @@ var musicSheetUploadFormDiv;
 var musicSheetDisplayTd;
 var currentPage;
 var autoFlipItv;
+var autoFlipInputElement;
 var fileList;
+var fileChanged;
+var autoflip;
 
 function initMusicSheet() {
 	musicSheetWrapperDiv = document.getElementById( "music_sheet_wrapper" );
@@ -17,7 +20,9 @@ function initMusicSheet() {
 	fileList = undefined;
 	musicSheetImagesDiv = undefined;
 	currentPage = 0;
+	fileChanged = false;
 	autoFlipItv = undefined;
+	autoflip = 0;
 	window.addEventListener( "resize", setMusicSheetLayer, false );
 	window.addEventListener( "scroll", setMusicSheetLayer, false );
 	setMusicSheetLayer();
@@ -50,6 +55,35 @@ function initMusicSheet() {
 	notePElement.innerHTML = "<i>Note: Your music sheet will be sorted by name.</i>";
 	musicSheetUploadFormDiv.appendChild( notePElement );
 	
+	var autoFlipPElement = document.createElement( "p" );
+	autoFlipPElement.innerHTML = "Auto flip interval (0 means disabled): ";
+	musicSheetUploadFormDiv.appendChild( autoFlipPElement );
+	autoFlipInputElement = document.createElement( "input" );
+	autoFlipInputElement.type = "text";
+	autoFlipInputElement.value = autoflip.toString();
+	autoFlipInputElement.unit = "ms";
+	autoFlipPElement.appendChild( autoFlipInputElement );
+	autoFlipPElement.appendChild( document.createTextNode( "  " ) );
+	var autoFlipAUnitElement = document.createElement( "a" );
+	autoFlipAUnitElement.innerHTML = "ms";
+	autoFlipAUnitElement.className = "musicSheetLink";
+	autoFlipAUnitElement.href = "javascript:;";
+	autoFlipAUnitElement.onclick = function ( e ) {
+		if ( e.target.innerHTML == "ms" ) {
+			e.target.innerHTML = "bar";
+			autoFlipInputElement.unit = "bar";
+		} else {
+			e.target.innerHTML = "ms";
+			autoFlipInputElement.unit = "ms";
+		}
+	}
+	autoFlipPElement.appendChild( autoFlipAUnitElement );
+	autoFlipPElement.appendChild( document.createTextNode( "\u00A0\u00A0\u00A0" ) );
+	var autoFlipSetElement = document.createElement( "a" );
+	autoFlipSetElement.href = "javascript: setAutoFlipInterval();";
+	autoFlipSetElement.innerHTML = "Set";
+	autoFlipSetElement.className = "musicSheetLink";
+	autoFlipPElement.appendChild( autoFlipSetElement );
 	var uploadResultPElement = document.createElement( "p" );
 	uploadResultPElement.style.color = "#888";
 	uploadResultPElement.innerHTML = "Number of music sheets uploaded: <b>0</b>.";
@@ -61,7 +95,7 @@ function initMusicSheet() {
 		e.target.className = (e.type == "dragover" ? "hover" : "");
 	};
 	var fileSelectHandler = function ( e ) {
-		var isValid = true;
+		fileChanged = true;
 		fileDragHandler( e );
 		var files = e.target.files || e.dataTransfer.files;
 		fileList = new Array();
@@ -83,11 +117,12 @@ function initMusicSheet() {
 	fileInputElement.addEventListener( "change", fileSelectHandler, false );
 	
 	var musicSheetOKPElement = document.createElement( "p" );
-	musicSheetOKPElement.innerHTML = "<a href=\"javascript: confirmMusicSheetUpload();\" class=\"musicSheetLink\">OK</a>&nbsp;&nbsp;<a href=\"javascript: cancelMusicSheetUpload();\" class=\"musicSheetLink\">Cancel</a>";
+	musicSheetOKPElement.innerHTML = "<a href=\"javascript: confirmMusicSheetUpload(); setAutoFlipInterval();\" class=\"musicSheetLink\">OK</a>&nbsp;&nbsp;<a href=\"javascript: cancelMusicSheetUpload();\" class=\"musicSheetLink\">Cancel</a>";
 	musicSheetUploadFormDiv.appendChild( musicSheetOKPElement );
 
 	/* Construct music sheet display layer */
 	musicSheetDisplayDiv = document.createElement( "div" );
+	musicSheetDisplayDiv.displaying = false;
 	var musicSheetDisplayTable = document.createElement( "table" );
 	musicSheetDisplayTable.width = "100%";
 	musicSheetDisplayDiv.appendChild( musicSheetDisplayTable );
@@ -182,12 +217,28 @@ function setMusicSheetLayer( e ) {
 }
 
 function setUploadForm() {
+	fileChanged = false;
 	musicSheetOopsDiv.style.display = "none";
+	if ( musicSheetDisplayDiv.displaying )
+		musicSheetDiv.removeChild( musicSheetDisplayDiv );
 	musicSheetDiv.appendChild( musicSheetUploadFormDiv );
 }
 
+function setAutoFlipInterval() {
+	var useMs = autoFlipInputElement.unit == "ms" ? true : false;
+	autoflip = parseInt( autoFlipInputElement.value );
+	if ( isNaN( autoflip ) || autoflip < 0 )
+		autoflip = 0;
+	var autoFlipText = document.getElementById( "autoflip_s" );
+	autoFlipText.innerHTML = autoflip == 0 ? "<i>Disabled</i>" : (autoflip.toString() + " " + autoFlipInputElement.unit);
+	if ( !useMs && autoflip > 0 ) {
+		var bpm = parseInt( element[ "song_tempo" ].innerHTML );
+		autoflip = Math.round( 60 * 1000 / bpm * 4 * autoflip );
+	}
+}
+
 function confirmMusicSheetUpload() {
-	if ( !fileList || fileList.length == 0 ) {
+	if ( !fileChanged || !fileList || fileList.length == 0 ) {
 		cancelMusicSheetUpload();
 		return;
 	}
@@ -218,6 +269,7 @@ function confirmMusicSheetUpload() {
 		musicSheetDisplayTd[2].innerHTML = "";
 	musicSheetDiv.removeChild( musicSheetUploadFormDiv );
 	musicSheetDiv.appendChild( musicSheetDisplayDiv );
+	musicSheetDisplayDiv.displaying = true;
 }
 
 function cancelMusicSheetUpload() {

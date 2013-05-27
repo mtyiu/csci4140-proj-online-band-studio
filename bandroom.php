@@ -1,495 +1,151 @@
 <?php
 	error_reporting(E_ALL);
 	ini_set('display_errors', '1');
-
-	function _post($str){
-	    $val = !empty($_POST[$str]) ? $_POST[$str] : null;
-	    return $val;
-	}
-
-	include('lock.php');
-	function connect(){
-		$conn = mysql_connect("localhost", "root", "csciband");
-		if(!$conn) {
-			die('Could not connect: ' . mysql_error());
-		}		
-		return $conn;
-	}
 	
-	function disconnect($conn){
-		mysql_close($conn);
-	}
-
-	$conn = connect();
-	mysql_select_db("prjband", $conn);
+	include('lock.php');
+	include('config.php');
+	
+	// Fix band ID for later use
 	$result = mysql_query("SELECT * FROM acct WHERE user = '$login_session'");
 	$row = mysql_fetch_array($result);
 	$band_id = $row["band_id"];
+	
+	// Kick the user out if the band room does not exist
 	$result = mysql_query("SELECT * FROM band WHERE band_id = '$band_id'");
 	$row = mysql_fetch_array($result);
 	if ( !$row ) {
 		header( "Location: welcome.php" );
 		exit;
 	}
+	$band_name = $row["name"];
+	$isAdmin = $row["admin"] == $login_session ? true : false;
 ?>
 <html>
-    <head>
-        <title>Bandroom Admin</title>
-        <link rel="stylesheet" type="text/css" href="414.css">
-    </head>
-    
-    <script type="text/javascript" src="ajax.js"></script>
-    <script type="text/javascript" src="chatbox.js"></script>
-    <script type="text/javascript" src="firebase.js"></script>
-    <script type="text/javascript" src="RTCMultiConnection-v1.2.js"></script>
+<head>
+	<title>Band Room #<? echo "$band_id: $band_name" ?></title>
+    <link rel="stylesheet" type="text/css" href="414.css">
+
+	<script type="text/javascript" src="bandroom.js"></script>
+	<script type="text/javascript" src="chatroom.js"></script>
+	<script type="text/javascript" src="music_sheet.js"></script>
+	<script type="text/javascript" src="firebase.js"></script>
+	<script type="text/javascript" src="RTCMultiConnection-v1.2.js"></script>
 	<script type="text/javascript" src="RecordRTC.js"></script>
 	<script type="text/javascript" src="audio-recorder.js"></script>
-    <script type="text/javascript" src="webaudio.js"></script>
-    <script type="text/javascript" src="set_client.js"></script>
-    <script type="text/javascript">
-        var i=0;
-        var sec=0;
-        var finish=0;
-		var uploaded=0;
-		var record=0;
-
-        setInterval(function(){
-			var img1 = document.getElementById("left");
-			var img2 = document.getElementById("right");
-			var user = document.getElementById("sheet1").attributes["name"].value;
-			var exten = document.getElementById("sheet2").attributes["name"].value;
-			var no_of_image = document.getElementById("upload").attributes["name"].value;
-			var period = document.getElementById("config").attributes["name"].value;
-			
-            if(sec == period && finish != 1 && uploaded == 1 && period != 0 && record == 1){
-				sec = 0;
-                var tmp = 0;
-                var path = 0;
-                
-                if(img1.name == i){
-                    tmp = i + 2;
-                    path = "image/" + user + "/" + tmp + "." + exten;
-                    if(i < no_of_image - 2){
-                        img1.src = path;
-                        i++;
-                        img1.name = tmp;
-                    }else{
-                        finish = 1;
-                    }
-                }else{
-                    if(img2.name == i){
-                        tmp = i + 2;
-                        path = "image/" + user + "/" + tmp + "." + exten;
-                        if(i < no_of_image - 2){
-                            img2.src = path;
-                            i++;
-                            img2.name = tmp;
-                        }else{
-                            finish = 1;
-                        }
-                    }
-                }
-            }else{
-                if(finish != 1 && record == 1){
-                    sec++;
-                }
-            }
-            
-        }, 1000);
-		
-		function start_record(){
-			<?php echo "var bandid = $band_id;"; ?>
-			if(record == 0){
-				record = 1;
-				document.getElementById("record").value = "Stop";
-				// Get player list
-				var request = new XMLHttpRequest();
-				request.open( "GET", "getPlayerList.php?band_id=" + bandid, false );
-				request.send();
-				if ( request.readyState == 4 ) {
-					if ( request.status != 200 ) {
-						alert( "Error code = " + request.status );
-						record = 0;
-					} else {
-						var playerList = JSON.parse( request.responseText );
-						startRecorder( playerList );
-					}
-				}
-			}else{
-				var img1 = document.getElementById("left");
-				var img2 = document.getElementById("right");
-				var user = document.getElementById("sheet1").attributes["name"].value;
-				var exten = document.getElementById("sheet2").attributes["name"].value;
-			
-				record = 0;
-				sec = 0;
-				finish = 0;
-				i = 0;
-				document.getElementById("record").value = "Record";
-
-				if (uploaded) {
-					var path = "image/" + user + "/" + 0 + "." + exten;
-					img1.src = path;
-					img1.name = "0";
-				
-					path = "image/" + user + "/" + 1 + "." + exten;
-					img2.src = path;
-					img2.name = "1";
-				}
-
-				stopRecorder();
-			}
-			
-			return false;
-		}
-        
-    </script>
-    
-    <body onload="signInOut();" onbeforeunload="autoSignOut();">
-		
+	<script type="text/javascript" src="webaudio.js"></script>
+	<script type="text/javascript">
+		var username = "<?php echo $login_session; ?>";
+		var isAdmin = <?php if ( $isAdmin ) echo "true"; else echo "false"; ?>;
+		window.addEventListener( "load",
+			function (e) {
+				initBandRoom(<?php echo $band_id; ?>);
+			}, false );
+		window.addEventListener( "beforeunload",
+			function (e) {
+				leaveBandRoom();
+			}, false );
+	</script>
+</head>
+<body>
+	<!-- HEADER START -->
+	<div id="bandtitle">
+		<h1 align="center">Band Room #<? echo "$band_id: $band_name" ?></h1>
 		<?php
-			if(!empty($_FILES["sheet_zip"]) && $_FILES["sheet_zip"] != ""){
-				if($_FILES["sheet_zip"]["error"] > 0){
-					echo "<script type='text/javascript'>alert('Error: " . $_FILES["sheet_zip"]["error"] . "');</script>";
-				}else{
-					$conn = connect();
-					mysql_select_db("prjband", $conn);
-					
-					$path = "image/" . $login_session . "/";
-					
-					$result = mysql_query("SELECT * FROM music_sheet WHERE user = '$login_session'");
-					$row = mysql_fetch_array($result);
-					
-					if($row["total_image"] != ""){
-						$no_of_image = $row["total_image"];
-						$exten = $row["extension"];
-						
-						$k = 0;
-						while($k < $no_of_image){
-							unlink($path . $k . "." . $exten);
-							$k++;
-						}
-					}
-
-					mkdir($path);
-					
-					move_uploaded_file($_FILES["sheet_zip"]["tmp_name"], $path . $_FILES["sheet_zip"]["name"]);
-					
-					$zipname = $_FILES["sheet_zip"]["name"];
-					
-					$zip = new ZipArchive;
-					$res = $zip->open($path . $zipname);
-					if ($res === TRUE){
-						$zip->extractTo($path);
-						$zip->close();
-					}else{
-						echo "<script type='text/javascript'>alert('Failed.');</script>";
-					}
-					
-					$zip = zip_open($path . $zipname);
-					if($zip){
-						$i = 0;
-						$check = 1;
-						
-						while($zip_entry = zip_read($zip)){
-							$entry = zip_entry_name($zip_entry);
-							
-							$file_parts = pathinfo($path . $entry);
-							
-							if(($file_parts['extension'] != "jpg" && $file_parts['extension'] != "png" && $file_parts['extension'] != "gif") || ($file_parts['extension'] != $prev_exten && $i != 0)){
-								if($check == 1){
-									echo "<script type='text/javascript'>alert('The format of file(s) contain(s) in " . $zipname . " is/are wrong.');</script>";
-								}
-								
-								$check = 0;
-							}else{
-								chmod($path . $entry, 0755);
-							}
-							
-							$prev_exten = $file_parts['extension'];
-							$i++;
-						}
-						
-						if($check == 1){
-							
-							$result = mysql_query("SELECT * FROM music_sheet WHERE user = '$login_session'");
-							$row = mysql_fetch_array($result);
-							
-							if($row["user"] != ""){
-								mysql_query("UPDATE music_sheet SET extension = '$prev_exten', total_image = $i WHERE user = '$login_session' ");
-							}else{
-								mysql_query("INSERT INTO music_sheet VALUES ('$login_session', '$prev_exten', $i)");
-							}
-							
-							disconnect($conn);
-						}else{
-							$k = 0;
-							while($k < $i){
-								unlink($path . $k . ".jpg");
-								unlink($path . $k . ".gif");
-								unlink($path . $k . ".png");
-								
-								$k++;
-							}
-						}
-						
-						zip_close($zip);
-						unlink($path . $zipname);
-						rmdir($path);
-						
-						echo "<script type='text/javascript'>";
-						echo "window.addEventListener( 'load', function() {";
-						echo "document.getElementById('left').style.visibility='visible';";
-						echo "document.getElementById('right').style.visibility='visible';";
-						echo "uploaded=1;";
-						echo "}, false);";
-						echo "</script>";
-					}
-					
+			// Generate music information
+			$result = mysql_query("SELECT * FROM music_info WHERE band_id = '$band_id'");
+			$row = mysql_fetch_array($result);
+		?>
+		<table width="100%">
+			<tr>
+			<td width="110"><p align="left"><b>Song Title: </b></p></td>
+			<td><p align="left" id="song_title"><?php echo $row["song_name"]; ?></td>
+			<td width="80"><p align="right"><b>Author: </b></p></td>
+			<td><p align="left" id="song_author"><?php echo $row["author"]; ?></td>
+			<td width="80"><p align="right"><b>Tempo: </b></p></td>
+			<td width="50"><p align="left" id="song_tempo"><?php echo $row["tempo"]; ?></td>
+			<td width="50"><p align="right"><b>Key: </b></p></td>
+			<td width="50"><p align="left" id="song_key"><?php echo $row["song_key"]; ?></td>
+			<td width="50"><p align="center"><a href="javascript:editSongInfo();">Edit</a></p></td>
+			<td width="100"><p align="right"><a href="javascript: leaveBandRoom();">Leave Room</a></p></td>
+			</tr>
+		</table>
+		<?php
+			// Generate player list
+			$result = mysql_query("SELECT * FROM band WHERE band_id = '$band_id'");
+			$row = mysql_fetch_array($result);
+			function printPlayerName( $name, $login_session ) {
+				switch ( $name ) {
+					case "":
+						echo "<font color=red>N/A</font>"; break;
+					case $login_session:
+						echo "<b>$name</b>"; break;
+					default:
+						echo "$name";
 				}
 			}
 		?>
-	
-        <table style="width: 100%; height: 100%;">
-            <tr>
-                <td style="width: 50%; height: 20%; border: 1px solid;">
-                    <div id="song_info">
-                        <form action="bandroom.php" method="post" >
-                            <h3><font color="white">Song Information</font></h3>
-							<?php							
-								$conn = connect();
-								
-								mysql_select_db("prjband", $conn);
-								
-								$result = mysql_query("SELECT * FROM music_info WHERE band_id = $band_id");
-								$row = mysql_fetch_array($result);
-								
-								if ( $row["band_id"] == "" ) {
-									mysql_query("INSERT INTO music_info VALUES ('$band_id', 'Untitled', 'N/A', 120, 'C')");
-									$result = mysql_query("SELECT * FROM music_info WHERE band_id = '$band_id'");
-									$row = mysql_fetch_array($result);
-								}
-								
-								if (_post("song_name") != "" || _post("author") != "" || _post("tempo") != "" || _post("key") != "") {
-									$song_name = _post("song_name");
-									$author = _post("author");
-									$tempo = _post("tempo");
-									$key = _post("key");
-									
-									if ($song_name != "")
-										mysql_query("UPDATE music_info SET song_name = '$song_name' WHERE band_id = '$band_id'");
-									if ($author != "")
-										mysql_query("UPDATE music_info SET author = '$author' WHERE band_id = '$band_id'");
-									if ($tempo != "")
-										mysql_query("UPDATE music_info SET tempo = $tempo WHERE band_id = '$band_id'");
-									if ($key != "")
-										mysql_query("UPDATE music_info SET song_key = '$key' WHERE band_id = '$band_id'");
-								}
-								
-								$result = mysql_query("SELECT * FROM music_info WHERE band_id = $band_id");
-								$row = mysql_fetch_array($result);
-								
-								if ( $row["band_id"] == "" ) {
-									mysql_query("INSERT INTO music_info VALUES ('$band_id', 'Untitled', 'N/A', 120, 'C')");
-									$result = mysql_query("SELECT * FROM music_info WHERE band_id = '$band_id'");
-									$row = mysql_fetch_array($result);
-								}
+		<table id="playerlist" align="center">
+			<tr>
+				<td width="60"><p class="playerTitle">Admin: </p></td>
+				<td width="100"><p id="adminName" class="adminName"><?php echo printPlayerName( $row["admin"], $login_session ); ?></p></td>
+				<td width="60"><p class="playerTitle">Player 1: </td>
+				<td width="100"><p id="player1Name" class="playerName"><?php echo printPlayerName( $row["player1"], $login_session ); ?></p></td>
+				<td width="60"><p class="playerTitle">Player 2: </td>
+				<td width="100"><p id="player2Name" class="playerName"><?php echo printPlayerName( $row["player2"], $login_session ); ?></p></td>
+				<td width="60"><p class="playerTitle">Player 3: </td>
+				<td width="100"><p id="player3Name" class="playerName"><?php echo printPlayerName( $row["player3"], $login_session ); ?></p></td>
+			</tr>
+		</table>
+	</div>
+	<!-- HEADER END -->
 
-								$song_name = $row["song_name"];
-								$author = $row["author"];
-								$tempo = $row["tempo"];
-								$key = $row["song_key"];
-							
-								disconnect($conn);
-							
-								echo "<table><tr>";
-								echo "<td align=right><font color='white'>Name:</font></td><td><input type='text' id='song_name' name='song_name' value='$song_name' /></td>";
-								echo "<td align=right><font color='white'>Author:</font></td><td><input type='text' id='author' name='author' value='$author' /><br /></td>";
-								echo "</tr><tr>";
-								echo "<td align=right><font color='white'>Tempo:</font></td><td><input type='text' id='tempo' name='tempo' value='$tempo' /></td>";
-								echo "<td align=right><font color='white'>Key:</font></td><td><input type='text' id='key' name='key' value='$key' /><br /></td>";
-								echo "</tr></table>";
-							?>
-                            <input type="submit" value="Set" id="setSongBtn" />
-                        </form>
-                    </div>
-                </td>
-                
-                <td style="width: 50%; height: 20%; border: 1px solid;">
-					<?php
-					$conn = connect();
-					
-					mysql_select_db("prjband", $conn);
-					$result = mysql_query("SELECT * FROM music_sheet WHERE user = '$login_session' ");
-					if ( $result ) {
-						$row = mysql_fetch_array($result);
-						$no_of_image = $row["total_image"];
-					} else
-						$no_of_image = 0;
-                    echo "<div id='upload' name=$no_of_image >";
-					disconnect($conn);
-					?>
-                        <form enctype="multipart/form-data" action="bandroom.php" method="post" >
-                            <h3><font color='white'>Music Sheet Upload</font></h3>
-                            <font color='white'>Choose File (.zip): <input type="file" name="sheet_zip" id="sheet_zip" accept="application/x-zip-compressed" /></font><br />
-                            <a href="sample.php" target="_blank"><font color='grey'>Sample File</font></a><br />
-                            <input type="submit" value="Upload" />
-                        </form>
-                    </div>
-                </td>
-            </tr>
-			
-            <tr>
-                <td style="width: 50%; height: 55%; border: 1px solid;">
-					<?php
-						echo "<div id='sheet1' name=$login_session>";
-						$conn = connect();
-					
-						mysql_select_db("prjband", $conn);
-						
-						$result = mysql_query("SELECT * FROM music_sheet WHERE user = '$login_session' ");
-						if ( $result ) {
-							$row = mysql_fetch_array($result);
-							$exten = $row["extension"];
-						}
-						$exten = "";
-						
-						$path = "image/" . $login_session . "/";
-						
-						$path0 = $path . 0 . "." . $exten;
-						$path1 = $path . 1 . "." . $exten;
-					
-						if($exten != ""){
-							$vis = "visible";
-							echo "<script type='text/javascript'>";
-							echo "uploaded=1;";
-							echo "</script>";
-						}else{
-							$vis = "hidden";
-						}
-						echo "<img id='left' align='right' name='0' style='visibility: $vis;' />";
-						
-						disconnect($conn);
-					?>
-                    </div>
-                </td>
-                
-                <td style="width: 50%; height: 55%; border: 1px solid;">
-					<?php
-						echo "<div id='sheet2' name=$exten>\n";
-						
-						echo "<img id='right' name='1' style='visibility: $vis;' />\n";
-
-						echo "<script type='text/javascript'>\n";
-						echo "	if (uploaded) {\n";
-						echo "		var ms0Element = document.getElementById('left');\n";
-						echo "		var ms1Element = document.getElementById('right');\n";
-						echo "		ms0Element.src = '$path0';\n";
-						echo "		ms1Element.src = '$path1';\n";
-						echo "	}\n";
-						echo "</script>\n";
-					?>
-                    </div>
-                </td>
-            </tr>
-            
-            <tr>
-                <td style="width: 50%; border: 1px solid;">
-                    <div id="chatroom">
-                        <form onsubmit="signInOut();return false" id="signInForm">
-							<?php
-								echo "<input id='userName' type='text' value='$login_session'>";
-							?>
-                            <input id="signInButt" name="signIn" type="submit" value="Sign In">
-                            <span id="signInName">User name</span>
-                        </form>
-                    
-                        <div id="chatBox" style="background-color: white;"></div>
-                        
-                        <div id="usersOnLine" style="background-color: white;"></div>
-                        
-                        <form onsubmit="sendMessage();return false" id="messageForm">
-                            <input id="message" type="text">
-                            <input id="send" type="submit" value="Send">
-                            <div id="serverRes"></div>
-                        </form>
-                    </div>
-                </td>
-                
-                <td style="width: 50%; border: 1px solid;">
-					<?php
-						$conn = connect();
-						
-						mysql_select_db("prjband", $conn);
-						$result = mysql_query("SELECT * FROM config WHERE user = '$login_session'");
-						$row = mysql_fetch_array($result);
-						
-						if($row["user"] == ""){
-							mysql_query("INSERT INTO config VALUES ('$login_session', 0, 0)");
-						}else{
-							if(_post("metro") != "" || _post("flip") != ""){
-								$metro = _post("metro");
-								$flip = _post("flip");
-								
-								if($metro != ""){
-									mysql_query("UPDATE config SET metronome = $metro WHERE user = '$login_session'");
-								}
-								
-								if($flip != ""){
-									mysql_query("UPDATE config SET auto_flip = $flip WHERE user = '$login_session'");
-								}
-							}
-						}
-						
-						$result = mysql_query("SELECT * FROM config WHERE user = '$login_session'");
-						$row = mysql_fetch_array($result);
-						
-						$metro = $row["metronome"];
-						$flip = $row["auto_flip"];
-						
-						echo "<div id='config' name=$flip>";
-						echo "<h3><font color='white'>Config</font></h3>";
-						
-						echo "<form action='bandroom.php' method='post' >";
-						
-						echo "<font color='white'>Metronome: </font><input type='text' id='metro' name='metro' value=$metro />";
-						echo "<font color='white'>Auto Flip (in second): </font><input type='text' id='flip' name='flip' value=$flip />";
-						
-						disconnect($conn);
-					?>
-					<p id="loading_local">Loading local media stream...</p>
-					<section id="local-media-stream"></section>
-					
-					<p id="loading_remote">Loading remote media stream...</p>
-					<section id="remote-media-streams"></section>
-					<script type="text/javascript">
-						<?php
-							$conn = connect();					
-							mysql_select_db("prjband", $conn);
-							$result = mysql_query("SELECT * FROM band WHERE band_id = '$band_id'");
-							$row = mysql_fetch_array($result);								
-							$band_id = $row["band_id"];
-							disconnect($conn);
-							echo "var band_id = $band_id;\n";
-							echo "var username = \"$login_session\";\n";
-							$isAdmin = ( $row["admin"] == $login_session ) ? true : false;
-							if ( !$isAdmin ) {
-								echo "setClient( band_id, username );";
-								echo "initAudio(band_id, username, false);";
-								echo "joinSession();";
-							} else {
-								echo "initAudio(band_id, username, true);";
-								echo "openSession();";
-							}
-						?>
-					</script>
-					<input type="submit" value="Set" />
-					</form>
-					<a href="mixer.php" target="_blank"><font color='grey'>Mixer</font></a>
-					<input type='button' id="record" value='Record' onclick="start_record();" />
-                    </div>
-                </td>
-            </tr>
-        </table>
-    </body>
+	<!-- MUSIC SHEET START -->
+	<div id="music_sheet_wrapper">
+		<div id="music_sheet">
+			<div id="oops_music_sheet">
+				<p>Oops! You didn't upload your music sheet!</p><a href="javascript: setUploadForm();" id="uploadMusicSheetLink" class="musicSheetLink" style="font-size: 20pt;">Upload Music Sheet</a>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">initMusicSheet();</script>
+	<!-- MUSIC SHEET END -->
+	<!-- FOOTER START -->
+	<div id="footer-container">
+	<div style="height: 10px;"></div>
+	<div id="footer">
+		<div id="chatroomBox" style="display: none;">
+			<table id="chatroomBoxTable">
+				<tr height="5" style="background: #AE0000;">
+					<td width="5" id="chatroomBoxTopLeft"></td>
+					<td id="chatroomBoxTop" colspan="2"></td>
+				</tr>
+				<tr height="30" style="background: #AE0000; color: #FFF;">
+					<td width="5" id="chatroomBoxLeftBanner"></td>
+					<td style="padding-bottom: 5px;" id="chatroomBoxMainBanner"><b>Chatroom</b></td>
+					<td width="150" style="cursor: pointer; text-align: right; padding-right: 5px; padding-bottom: 5px;" id="chatroomBoxPopupTd"><input type="checkbox" id="popup"> Allow auto pop-up</td>
+				</tr>
+				<tr>
+					<td width="5" id="chatroomBoxLeft"></td>
+					<td id="chatroomContentTd" colspan="2"><div id="chatroomContent"></div></td>
+				</tr>
+				<tr height="25">
+					<td colspan="3"><input type="text" id="chatroomMsgInput" style="width: 100%; height: 25px"></td>
+				</tr>
+			</table>
+		</div>
+		<table id="footerTable">
+			<tr>
+			<td width="40"><b id="recordStartStop" class="startButton"></b></td>
+			<td width="15%"><a href="javascript:startRecorder();" id="recordText" class="startRecordText">Record</a></td>
+			<td><p align="center"><a href="javascript:toggleAudioStreams();">View All Audio Streams</a></p></td>
+			<td id="mixer"><b><a href="javascript: showMixer();">Mixer</a></b></td>
+			<td id="musicsheetedit"><a href="javascript: setUploadForm();">Edit Music Sheet</a></td>
+			<td id="autoflip"><b>Auto flip:</b>&nbsp;<font id="autoflip_s"><i>Disabled</i></font> </td>
+			<td id="chatroomButton"><b>Chatroom(<span id="onlineCount">1</span>)</b></td>
+			</tr>
+		</table>
+	</div>
+	</div>
+	<!-- FOOTER END -->
+</body>
 </html>

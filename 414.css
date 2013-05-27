@@ -76,9 +76,6 @@ td.mainon{
 	height: 33px;
 	color: #FFFFFF;
 }
-.room{
-	color: #FFFFFF;
-}
 .box_top_line {
 	background: url(top_line.gif) left top repeat-x;
 	height: 9px;
@@ -94,65 +91,6 @@ td.mainon{
 .box_bottom_line {
 	background: url(bottom_line.gif) left top repeat-x;
 	height: 9px;
-}
-#signInForm, #messageForm {
-	margin: 0px;
-	margin-bottom: 1px;
-}
-#userName {
-	width: 150px;
-	height: 22px;
-	border: 1px teal solid;
-	float: left;
-}
-#signInButt {
-	width: 60px;
-	height: 22px;
-}	
-#signInName{
-	font-family: Tahoma;
-	font-size: 12px;
-	color: orange;
-}
-#chatBox {
-	font-family: Tahoma;
-	font-size: 12px;
-	color: black;
-	border: 1px teal solid;
-	height: 100px;
-	width: 400px;
-	overflow: scroll;
-	float: left;
-}
-#usersOnLine{
-	font-family: Tahoma;
-	font-size: 14;
-	color: orange;
-	border: 1px teal solid;
-	width: 150px;
-	height: 100px;
-	overflow: scroll;
-	margin-left: 1px;
-}
-#message {
-	width: 350px;
-	height: 22px;
-	border: 1px teal solid;
-	float: left;
-	margin-top: 1px;
-}
-#send {
-	width: 50px;
-	height: 22px;
-	float: left;
-	margin: 1px;
-}
-#serverRes{
-	width: 150px;
-	height: 22px;
-	border: 1px teal solid;
-	float: left;
-	margin: 1px;
 }
 #bandtitle {
 	width: 90%;
@@ -293,6 +231,7 @@ h2 {
 	position: fixed;
 }
 #footer {
+	position: relative;
 	width: 90%;
 	max-width: 1200px;
 	background: rgba(100%,100%,100%,0.8);
@@ -308,8 +247,8 @@ h2 {
 	height: 40px;
 	vertical-align: center;
 }
-#metronome {
-	width: 15%;
+#musicsheetedit {
+	width: 20%;
 	text-align: center;
 }
 #autoflip {
@@ -324,6 +263,73 @@ h2 {
 	border-color: #666;
 	text-align: center;
 	color: #555;
+	cursor: pointer;
+}
+#chatroomButton.shown {
+	color: #DDD;
+	background: #888;
+}
+#chatroomButton.over {
+	color: #DDD;
+	background: #AAA;
+}
+#chatroomButton.unread {
+	color: #FFF;
+	background: #AE0000;
+}
+#chatroomBox {
+	width: 400px;
+	height: 400px;
+	background: rgba( 100%, 100%, 100%, 0.9 );
+	color: #333;
+	right: 13px;
+	bottom: 40px;
+	border-style: solid;
+	border-color: #777;
+	border-width: 1pt;
+	position: absolute;
+}
+#chatroomBoxTable {
+	width: 100%;
+	height: 100%;
+	font-size: 12px;
+	border-width: 0px;
+	border-spacing: 0px;
+}
+#chatroomBoxTopLeft {
+	cursor: nw-resize;
+}
+#chatroomBoxTop {
+	cursor: n-resize;
+}
+#chatroomBoxLeftBanner {
+	cursor: w-resize;
+}
+#chatroomBoxLeft {
+	cursor: w-resize;
+}
+#chatroomContentTd {
+	vertical-align: bottom;
+}
+#chatroomContent {
+	padding-right: 5pt;
+	padding-bottom: 10pt;
+	overflow-y: scroll;
+	height: 100%;
+	bottom: 0px;
+}
+hr {
+	border-style: solid;
+	border-width: 1px;
+	border-color: #EEE;
+}
+.message {
+	padding-top: 5pt;
+	padding-bottom: 5pt;
+	border-top: 1px solid #CCC;
+}
+.chatUsername {
+	font-weight: bold;
 }
 #wrapper {
 	left: 0px;

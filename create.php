@@ -30,6 +30,10 @@
 		}
 		$sql = "UPDATE acct SET band_id = $id WHERE user = '$login_session'";
 		$result = mysql_query( $sql );
+		
+		// Update mixer
+		$sql = "INSERT INTO mixer VALUES ($id, '$login_session', 50, 50)";
+		$result = mysql_query( $sql );
 	}
 ?>
 

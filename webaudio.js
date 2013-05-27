@@ -2,7 +2,6 @@ var connection;
 var sessionID;
 var localMediaStream;
 var recorder;
-var time;
 var waitAck;
 var playerlist;
 
@@ -22,7 +21,8 @@ var numPlayers;
 function initAudio( currentSessionID ) {
 	sessionID = currentSessionID;
 	location.hash = "#" + sessionID;
-
+	hiSound = undefined;
+	lowSound = undefined;
 	showAudioStream = false;
 	audioStreamTable = document.createElement( "table" );
 	audioStreamTable.width = "90%";
@@ -68,8 +68,7 @@ function initAudio( currentSessionID ) {
 	connection.session = 'audio and data';
 	connection.onmessage = messageMux;
 	connection.onleave = function( userid, extra ) {
-		console.log( userid );
-		if (!isadmin) signInOut();
+		if (!isAdmin) leaveBandRoom();
 	};
 	connection.onstream = function (stream) {
 		if (stream.type === 'remote') {
@@ -122,19 +121,21 @@ function messageMux( message ) {
 	switch( message ) {
 		case "start":
 		case "end":
-			var timer = new Date();
-			time = timer.getTime();
 			connection.send( 'ack' );
 			start_record();
 			break;
 		case "ack":
 			if ( waitAck ) {
-				var timer = new Date();
-				console.log( "[ACK] Timeout: " + (5000 - (timer.getTime() - time)) );
-				window.setTimeout( recorder.recordAudio, 5000 - (timer.getTime() - time) );
+				recordTimeoutHandler();
 			}
 			waitAck = false;
 			break;
+		default:
+			if ( message.substr( 0, 4 ) == "CHAT" ) {
+				var messageUsername = message.match(/^CHAT:<font class="chatUsername">\[(.*)\]<\/font>.+$/);
+				if ( messageUsername && messageUsername != username )
+					chatroomReceiveMessage( message.substr( 5, message.length - 5 ) );
+			}
 	}
 }
 
@@ -154,17 +155,40 @@ function startRecorder() {
 	recordTextElement.className = "stopRecordText";
 	recordTextElement.href = "javascript: stopRecorder();";
 	if (isAdmin) {
-		var timer = new Date();
-		time = timer.getTime();
 		connection.send( 'start' );
-		waitAck = true;
+		if ( playerlist.length > 1 )
+			waitAck = true;
+		else
+			recordTimeoutHandler();
 	} else {
-		var timer = new Date();
-		console.log( "[START] Timeout: " + (5000 - (timer.getTime() - time)) );
-		window.setTimeout( recorder.recordAudio, 5000 - (timer.getTime() - time) );
+		recordTimeoutHandler();
 	}
 }
 
+function recordTimeoutHandler() {
+	var currentTimeLeft;
+	var timer = new Date();
+	var startTime = timer.getTime();
+	wrapper.style.display = "";
+	promptlayer.myHeight = "70px";
+	setPromptLayer();
+	for ( var timeLeft = 0, timeBound = startTime + 5000; timeLeft + startTime < timeBound; timeLeft += 1000 ) {
+		window.setTimeout( function() {
+			var timeLeftInSeconds = (5000 - timeLeft) / 1000;
+			return function (e) {
+				h2Element.innerHTML = "Starting recording in " + timeLeftInSeconds + " seconds...";
+			}
+		}(), timeLeft );
+	}
+	currentTimeLeft = 5000 - (timer.getTime() - startTime);
+	window.setTimeout( function() {
+		recorder.recordAudio();
+		startAutoFlip();
+		promptlayer.myHeight = undefined;
+		setPromptLayer();
+		wrapper.style.display = "none";
+	}, currentTimeLeft );
+}
 
 function stopRecorder() {
 	recordButtonElement.className = "startButton";
@@ -217,6 +241,10 @@ function stopRecorder() {
 		}
 		tableElement.appendChild( trElements[i] );
 	}
+	okPElement = document.createElement("p");
+	okPElement.align = "center";
+	okPElement.innerHTML = "<a href=\"javascript:disablePrompt();\">OK</a>";
+	promptlayer.appendChild( okPElement );
 	wrapper.style.display = "";
 }
 
@@ -300,12 +328,8 @@ function uploadWAV(url, blob) {
 		mixPElement = document.createElement("p");
 		mixPElement.align = "center";
 		mixPElement.innerHTML = "Mixing your song...";
-		promptlayer.appendChild( mixPElement );
+		promptlayer.insertBefore( mixPElement, okPElement );
 		
-		okPElement = document.createElement("p");
-		okPElement.align = "center";
-		okPElement.innerHTML = "<a href=\"javascript:disablePrompt();\">OK</a>";
-		promptlayer.appendChild( okPElement );
 		var mixRequest = new XMLHttpRequest();
 		mixRequest.onreadystatechange = function() {
 			if ( mixRequest.readyState == 4 ) {

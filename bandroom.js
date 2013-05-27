@@ -1,8 +1,6 @@
 var playerlist;
 var bandId;
 var updateItv;
-var metronome;
-var autoflip;
 
 /* DOM manipulation */
 var element;
@@ -20,14 +18,13 @@ var tdWidth;
 var tdAlign;
 var okPElement;
 var loaded;
+var left;
 
 function initBandRoom( bandid ) {
 	bandId = bandid;
-	metronome = false;
-	autoflip = 0;
 	element = new Array();
 	elementList = [ "song_title", "song_author", "song_tempo", "song_key",
-					"adminName", "player1Name", "player2Name", "player3Name" ];
+					"adminName", "player1Name", "player2Name", "player3Name", "onlineCount" ];
 	
 	for ( var i = 0; i < elementList.length; i++ )
 		element[ elementList[i] ] = document.getElementById( elementList[i] );
@@ -42,8 +39,31 @@ function initBandRoom( bandid ) {
 	} else {
 		joinSession();
 	}
+	initChatRoom();
 	update(true);
 	loaded = true;
+	left = false;
+}
+
+function leaveBandRoom() {
+	if ( !left ) {
+		var xhr = new XMLHttpRequest();
+		xhr.open( "POST", "exitRoom.php", false );
+		xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		input = "band_id=" + bandId;
+		xhr.send( input );
+		if ( xhr.readyState == 4 ) {
+			if ( xhr.status != 200 )
+				console.log( "leaveBandRoom(): Request failed with code " + new String( xhr.status ) );
+			else {
+				if ( xhr.responseText != "OK" ) {
+					console.log( xhr.responseText );
+				}
+			}
+		}
+		left = true;
+	}
+	window.location.assign( "welcome.php" );
 }
 
 function preparePromptLayer() {
@@ -372,20 +392,6 @@ function cancelSongInfo() {
 	wrapper.style.display = "none";
 }
 
-function toggleMetronome() {
-	var metronome_on = document.getElementById( "metronome_on" );
-	if ( metronome ) {
-		// Turn off
-		metronome_on.innerHTML = "Off";
-		metronome_on.color = "red";
-	} else {
-		// Turn on
-		metronome_on.innerHTML = "On";
-		metronome_on.color = "#009900";
-	}
-	metronome = !metronome;
-}
-
 function update( sync ) {
 	var xhr = new XMLHttpRequest();
 	xhr.open( "GET", "getInfo.php?band_id=" + bandId, !sync );
@@ -411,6 +417,7 @@ function update( sync ) {
 						element[ elementList[i + 4] ].innerHTML = "<font color=red>N/A</font>";
 					}
 				}
+				element[ elementList[8] ].innerHTML = playerlist.length.toString();
 			}
 		}
 	}
