@@ -6,7 +6,7 @@
 <html>
     <head>
         <title>Online Band Room</title>
-        <link rel=stylesheet type="text/css" href="414.css">
+        <link rel=stylesheet type="text/css" href="css/stylesheet.css">
         <script language="JavaScript">
             function logout()
             {
@@ -23,7 +23,7 @@
                    
             }
         </script>
-         <script language="javascript" src="action.js"></script>
+         <script language="javascript" src="js/action.js"></script>
     </head> 
     <body >
         
@@ -110,9 +110,9 @@
                       <tr>
                         <td align="left" valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="0">
                             <tr>
-                              <td align="left" valign="top"><img src="box_left_top.gif" alt="" width="9" height="9" /></td>
-                              <td align="left" valign="top" class="box_top_line"><img src="top_line.gif" alt="" width="4" height="9" /></td>
-                              <td align="left" valign="top"><img src="box_right_top.gif" alt="" width="9" height="9" /></td>
+                              <td align="left" valign="top"><img src="images/box_left_top.gif" alt="" width="9" height="9" /></td>
+                              <td align="left" valign="top" class="box_top_line"><img src="images/top_line.gif" alt="" width="4" height="9" /></td>
+                              <td align="left" valign="top"><img src="images/box_right_top.gif" alt="" width="9" height="9" /></td>
                             </tr>
                             <tr>
                               <td rowspan="2" align="left" valign="top" class="box_left_line">&nbsp;</td>
@@ -143,9 +143,9 @@
                                 <p>&nbsp;</p></td>
                             </tr>
                             <tr>
-                              <td height="118" align="left" valign="top"><img src="box_left_bottom.gif" alt="" width="9" height="9" /></td>
-                              <td align="left" valign="top" class="box_bottom_line"><img src="bottom_line.gif" alt="" width="4" height="9" /></td>
-                              <td align="left" valign="top"><img src="box_right_bottom.gif" alt="" width="9" height="9" /></td>
+                              <td height="118" align="left" valign="top"><img src="images/box_left_bottom.gif" alt="" width="9" height="9" /></td>
+                              <td align="left" valign="top" class="box_bottom_line"><img src="images/bottom_line.gif" alt="" width="4" height="9" /></td>
+                              <td align="left" valign="top"><img src="images/box_right_bottom.gif" alt="" width="9" height="9" /></td>
                             </tr>
                         </table><table width="100%" border="0" cellspacing="0" cellpadding="0">
                            

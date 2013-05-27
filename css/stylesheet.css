@@ -1,7 +1,7 @@
 body {
 	background-color: #000000;
 	margin: auto;
-	background-image: url('6.jpg');
+	background-image: url( '../images/background.jpg' );
 	background-repeat: no-repeat;
 	background-position: center top;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
@@ -25,7 +25,7 @@ a:hover {
 	width: 800px;
 	height: 250px;
 	margin: auto;
-	background: url(bg_r1_c2.png) no-repeat center;
+	background: url( '../images/bg_r1_c2.png' ) no-repeat center;
 	background-color: rgba(0,0,0,0.9); 
 }
 #main_content {
@@ -67,29 +67,29 @@ a:hover {
 	color: #FFFFFF;
 }
 td.mainoff {
-	background: url(main_menu_bg.gif) -130px 0px no-repeat;
+	background: url( '../images/main_menu_bg.gif' ) -130px 0px no-repeat;
 	height: 33px;
 	color: #FFFFFF;  
 }
 td.mainon{
-	background: url(main_menu_bg.gif) 0px 0px no-repeat;
+	background: url( '../images/main_menu_bg.gif' ) 0px 0px no-repeat;
 	height: 33px;
 	color: #FFFFFF;
 }
 .box_top_line {
-	background: url(top_line.gif) left top repeat-x;
+	background: url( '../images/top_line.gif' ) left top repeat-x;
 	height: 9px;
 }
 .box_left_line {
-	background: url(left_line.gif) left top repeat-y;
+	background: url( '../images/left_line.gif' ) left top repeat-y;
 	width: 9px;
 }
 .box_right_line {
-	background: url(right_line.gif) left top repeat-y;
+	background: url( '../images/right_line.gif' ) left top repeat-y;
 	width: 9px;
 }
 .box_bottom_line {
-	background: url(bottom_line.gif) left top repeat-x;
+	background: url( '../images/bottom_line.gif' ) left top repeat-x;
 	height: 9px;
 }
 #bandtitle {

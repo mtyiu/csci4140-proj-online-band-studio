@@ -39,7 +39,7 @@
 <html>
 	<head>
 		<title>Online Band Room</title>
-		<link rel=stylesheet type="text/css" href="414.css">
+		<link rel=stylesheet type="text/css" href="css/stylesheet.css">
 	</head>
 	<body style="color:#FFF">
 		<div id="main_content">
@@ -47,7 +47,7 @@
 			<div id="section2"></div>
 			<div id="right_section2">
 				<p align="center">
-					<img src="title.png">
+					<img src="images/title.png">
 				</p>
 				<table width="300" border="0" align="center" cellpadding="0" cellspacing="1">
 					<tr>

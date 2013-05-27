@@ -40,7 +40,7 @@
 <html>
 	<head>
 		<title>Online Band Room</title>
-		<link rel=stylesheet type="text/css" href="414.css">
+		<link rel=stylesheet type="text/css" href="css/stylesheet.css">
 		<script language="JavaScript">
 			function logout() {
 				window.location.assign("welcome.php");

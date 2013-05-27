@@ -23,16 +23,16 @@
 <html>
 <head>
 	<title>Band Room #<? echo "$band_id: $band_name" ?></title>
-    <link rel="stylesheet" type="text/css" href="414.css">
+    <link rel="stylesheet" type="text/css" href="css/stylesheet.css">
 
-	<script type="text/javascript" src="bandroom.js"></script>
-	<script type="text/javascript" src="chatroom.js"></script>
-	<script type="text/javascript" src="music_sheet.js"></script>
-	<script type="text/javascript" src="firebase.js"></script>
-	<script type="text/javascript" src="RTCMultiConnection-v1.2.js"></script>
-	<script type="text/javascript" src="RecordRTC.js"></script>
-	<script type="text/javascript" src="audio-recorder.js"></script>
-	<script type="text/javascript" src="webaudio.js"></script>
+	<script type="text/javascript" src="js/bandroom.js"></script>
+	<script type="text/javascript" src="js/chatroom.js"></script>
+	<script type="text/javascript" src="js/music_sheet.js"></script>
+	<script type="text/javascript" src="js/firebase.js"></script>
+	<script type="text/javascript" src="js/RTCMultiConnection-v1.2.js"></script>
+	<script type="text/javascript" src="js/RecordRTC.js"></script>
+	<script type="text/javascript" src="js/audio-recorder.js"></script>
+	<script type="text/javascript" src="js/webaudio.js"></script>
 	<script type="text/javascript">
 		var username = "<?php echo $login_session; ?>";
 		var isAdmin = <?php if ( $isAdmin ) echo "true"; else echo "false"; ?>;
