@@ -178,14 +178,21 @@ function recordTimeoutHandler() {
 	var currentTimeLeft;
 	var timer = new Date();
 	var startTime = timer.getTime();
-	wrapper.style.display = "";
-	promptlayer.myHeight = "70px";
-	setPromptLayer();
+	var startAlertElement;
+	if ( wrapper.style.display == "none" ) {
+		wrapper.style.display = "";
+		promptlayer.myHeight = "70px";
+		setPromptLayer();
+		startAlertElement = h2Element;
+	} else {
+		startAlertElement = document.createElement( "h2" );
+		promptlayer.insertBefore( startAlertElement, h2Element );
+	}
 	for ( var timeLeft = 0, timeBound = startTime + 5000; timeLeft + startTime < timeBound; timeLeft += 1000 ) {
 		window.setTimeout( function() {
 			var timeLeftInSeconds = (5000 - timeLeft) / 1000;
 			return function (e) {
-				h2Element.innerHTML = "Starting recording in " + timeLeftInSeconds + " seconds...";
+				startAlertElement.innerHTML = "Starting recording in " + timeLeftInSeconds + " seconds...";
 			}
 		}(), timeLeft );
 	}
@@ -194,8 +201,12 @@ function recordTimeoutHandler() {
 		recorder.recordAudio();
 		startAutoFlip();
 		promptlayer.myHeight = undefined;
-		setPromptLayer();
-		wrapper.style.display = "none";
+		if ( startAlertElement === h2Element ) {
+			setPromptLayer();
+			wrapper.style.display = "none";
+		} else {
+			promptlayer.removeChild( startAlertElement );
+		}
 	}, currentTimeLeft );
 }
 
