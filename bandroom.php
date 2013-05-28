@@ -22,7 +22,7 @@
 ?>
 <html>
 <head>
-	<title>Band Room #<? echo "$band_id: $band_name" ?></title>
+	<title>Band Room #<? echo "$band_id: $band_name" ?> - Online Band System</title>
     <link rel="stylesheet" type="text/css" href="css/stylesheet.css">
 
 	<script type="text/javascript" src="js/bandroom.js"></script>

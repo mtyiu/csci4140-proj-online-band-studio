@@ -40,7 +40,7 @@
 ?>
 <html>
 	<head>
-		<title>Online Band Room</title>
+		<title>Login - Online Band System</title>
 		<link rel=stylesheet type="text/css" href="css/stylesheet.css">
 	</head>
 	<body style="color:#FFF">
@@ -90,6 +90,8 @@
 						</form>
 					</tr>
 				</table>
+				<p style="height: 20px;">&nbsp;</p>
+				<p id="comments">CSCI 4140 Project - Online Band System by Gangnam Style<br />2013 Spring</p>
 			</div>
 		</div>
 	</body>

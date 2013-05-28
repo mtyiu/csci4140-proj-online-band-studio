@@ -43,7 +43,7 @@
 
 <html>
 	<head>
-		<title>Online Band Room</title>
+		<title>Create New Band Room - Online Band System</title>
 		<link rel=stylesheet type="text/css" href="css/stylesheet.css">
 		<script language="JavaScript">
 			function logout() {
@@ -107,6 +107,8 @@
 						</table>
 					</form>
 					<button onClick="back()" value="back">Back</button>
+					<p style="height: 20px;">&nbsp;</p>
+					<p id="comments">CSCI 4140 Project - Online Band System by Gangnam Style<br />2013 Spring</p>
 				</div>
 			</div>
 		</div>

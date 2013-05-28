@@ -1,0 +1,75 @@
+-----------------
+| Demonstration |
+-----------------
+Project:	Online Band System
+Name:		Gangnam Style
+Date:		2013 May 29
+Time:		4:00 - 4:30 pm
+Venue:		SHB 904
+
+--------
+| Flow |
+--------
+###############
+# Preparation #
+###############
+- Setup environment on 4 machines (web page, audio input & output) (5 minutes)
+- Show login and registration system (2 minutes)
+	- Account: [tywong, sosad], [wendy, hihi], [eddy, 123], [mtyiu, 123456], [mole, wuar], [derek, 123]
+- Create new band room (4 rooms, 16 people) (2 minute) [5%]
+	- Show player number limit (4 people)
+	- Show room number limit (4 rooms)
+- Update band room list using AJAX (1 minute)
+
+#######################
+# 2 players in a room #
+#######################
+- 2 players go to the same band room (1 minute)
+	- Asynchronous update of player list in admin (1 minute)
+	- Player leaves room (1 minute)
+- Sound capturing: 1 audio input per user [5%]
+	- Using Web Audio API / WebRTC
+	- Audio playback of local audio stream (1 minute)
+	- Audio playback of remote audio stream (1 minute) [10% (a)]
+- Basic operations inside band room
+	- Edit song information and asynchronous update (1 minute)
+	- Mixer configuration (1 minute)
+	- Chatroom (2 minute)
+		- Auto popup
+	- Upload music sheet and navigation (2 minute)
+		- Set up auto flipping (1000 ms)
+- Start recording in admin
+	- Use Song #1 in admin, drums in player 1 (record 1 minute)
+	- Instant audio playback
+	- Playback with server-side mixing (1 minute) [10% (b)]
+		- Download admin WAV file
+		- Download player 1 WAV file
+		- Download mixed audio
+- Admin leaves room, forcing player 1 to leave (1 minute)
+
+#######################
+# 4 players in a room #
+#######################
+- Create a new band room for all 4 players (1 minute)
+- In admin, set song information and mixer configuration (1 minute)
+	- Audio playback of local audio stream (1 minute)
+	- Audio playback of remote audio stream (1 minute) [10% (a)]
+- In players, upload music sheet. (2 minutes)
+- Start recording in admin
+	- Use Song #2 in admin, drums in player 1, piano in player 2, ? in player 3 (record 1 minute)
+	- Instant audio playback
+	- Playback with server-side mixing (2 minute) [10% (b)]
+		- Download admin WAV file
+		- Download player 1-3 WAV file
+		- Download mixed audio
+		- Propagate the mixed audio to all players
+- Admin leaves room, forcing player 1-3 to leave (1 minute)
+
+// Time estimation: 34 minutes //
+
+----------------------------------------------
+| Open-source libraries used in this project |
+----------------------------------------------
+RTCMultiConnection: https://github.com/muaz-khan/WebRTC-Experiment/tree/master/RTCMultiConnection
+RecordRTC: https://webrtc-experiment.appspot.com/RecordRTC/
+Ecasound: http://www.eca.cx/ecasound/

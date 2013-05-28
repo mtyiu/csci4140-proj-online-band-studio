@@ -4,7 +4,7 @@
 ?>
 <html>
 <head>
-	<title>Online Band System</title>
+	<title>Welcome - Online Band System</title>
 	<link rel=stylesheet type="text/css" href="css/stylesheet.css">
 	<script type="text/javascript" src="js/welcome.js"></script>
 </head>
@@ -98,6 +98,8 @@
 						</td>
 					</tr>
 				</table>
+				<p style="height: 20px;">&nbsp;</p>
+				<p id="comments">CSCI 4140 Project - Online Band System by Gangnam Style<br />2013 Spring</p>
 			</div>
 		</div>
 	</div>
