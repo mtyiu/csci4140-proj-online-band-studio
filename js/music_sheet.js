@@ -275,7 +275,7 @@ function confirmMusicSheetUpload() {
 
 function cancelMusicSheetUpload() {
 	musicSheetDiv.removeChild( musicSheetUploadFormDiv );
-	if ( !fileChanged && fileList.length > 0 ) {
+	if ( !fileChanged && fileList && fileList.length > 0 ) {
 		musicSheetDiv.appendChild( musicSheetDisplayDiv );
 		musicSheetDisplayDiv.displaying = true;
 	} else {

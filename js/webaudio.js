@@ -380,7 +380,8 @@ function uploadWAV(url, blob) {
 
 function disablePrompt() {
 	promptlayer.removeChild( tableElement );
-	promptlayer.removeChild( mixPElement );
+	if ( mixPElement != undefined )
+		promptlayer.removeChild( mixPElement );
 	promptlayer.removeChild( okPElement );
 	for ( var i = 0; i < numPlayers; i++ ) {
 		if ( playerlist[i] == username )

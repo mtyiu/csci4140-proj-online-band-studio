@@ -774,7 +774,6 @@
                 RTCDataChannels[RTCDataChannels.length] = channel;
                 if (config.onChannelOpened) config.onChannelOpened(extra);
                 onSessionOpened();
-				console.log( RTCDataChannels );
             }
 
             function onSessionOpened() {
