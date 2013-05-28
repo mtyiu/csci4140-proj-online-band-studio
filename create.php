@@ -15,7 +15,7 @@
 			$sql = sprintf( "SELECT * FROM `band` WHERE band_id = %d;", $i + 1 );
 			$result = mysql_query( $sql ) or die( 'MySQL query error' );
 			$cnt = mysql_num_rows( $result );
-			if ( $cnt ) {
+			if ( $cnt == 1 ) {
 				$bandroomExist[$i] = true;
 				$numRecord++;
 			} else {
@@ -71,18 +71,25 @@
 					<form name="form2" action="create.php" method="post">
 						<table width="600" border="0" cellspacing="4" bgcolor="#D2C2E0">
 							<?php
-								$sql = "SELECT * FROM `band`";
-								$result = mysql_query( $sql ) or die( 'MySQL query error' );
-								$no_record = mysql_num_rows( $result );
+								$new_id = 0;
+								for ($i = 0; $i < 4; $i++) {
+									$sql = sprintf( "SELECT * FROM `band` WHERE band_id = %d;", $i + 1 );
+									$result = mysql_query( $sql ) or die( 'MySQL query error' );
+									$cnt = mysql_num_rows( $result );
+									if ( $cnt != 1 ) {
+										$new_id = $i + 1;
+										break;
+									}
+								}
 							?>
 							<tr>
 								<td width="200"><strong>ID:</strong>
 								</td>
-								<td><strong><?php echo $no_record+1?></strong>
+								<td><strong><?php echo $new_id; ?></strong>
 								</td>
 							</tr>
 							<tr>
-								<td width="200"><strong>Band room's Name(max = 8):</strong>
+								<td width="200"><strong>Band Room's Name:</strong>
 								</td>
 								<td><strong><input name="bandname" type="text" maxlength="8"></strong>
 								</td>

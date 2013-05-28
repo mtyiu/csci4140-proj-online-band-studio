@@ -122,24 +122,29 @@
                             <tr>
                                 <td style="padding:5px; text-align:justify; background-color:#D2C2E0;" align="left" valign="top" >
                                  <?php
-                                $sql = "SELECT * FROM `band` WHERE band_id=1 ;";
-                                $result = mysql_query($sql) or die('MySQL query error');   
-                                $row = mysql_fetch_array($result);
-                                echo "<p id=name ><strong>Name:</strong> {$row['name']}</p>";
-                             echo "<p id=admin ><strong>Administrator:</strong> {$row['admin']}</p>";
-                             echo "<p id=players ><strong>No. of Players Available:</strong> {$row['no_player']}</p>";
-                            echo "<p id=desc ><strong>Description:</strong> {$row['content']}</p>";
-                            if ($row['no_player'] < 4){
-                                echo " <a href='javascript:;'><img id=jopic1 onclick=join(1) align=right src='images/join.png'  onmouseover=this.src='images/join2.png' onmouseout=this.src='images/join.png' style='visibility:visible;'></a>
-                            ";
-                            }
-                             else{
-                            
-                                echo "<a href='javscript:;'><img id=jopic1 onclick=join(1) align=right src='images/join.png'  onmouseover=this.src=''images/join2.png'' onmouseout=this.src=''images/join.png'' style='visibility:hidden;'></a>";
-                          
-                          }
-                               ?>   
-                                   
+								 	$new_id = 0;
+									for ($i = 0; $i < 4; $i++) {
+										$sql = sprintf( "SELECT * FROM `band` WHERE band_id = %d;", $i + 1 );
+										$result = mysql_query( $sql ) or die( 'MySQL query error' );
+										$cnt = mysql_num_rows( $result );
+										if ( $cnt == 1 ) {
+											$new_id = $i + 1;
+											break;
+										}
+									}
+									$sql = "SELECT * FROM `band` WHERE band_id=$new_id";
+									$result = mysql_query($sql) or die('MySQL query error');
+									$row = mysql_fetch_array($result);
+									echo "<p id=name ><strong>Name:</strong> {$row['name']}</p>";
+									echo "<p id=admin ><strong>Administrator:</strong> {$row['admin']}</p>";
+									echo "<p id=players ><strong>No. of Players Available:</strong> {$row['no_player']}</p>";
+									echo "<p id=desc ><strong>Description:</strong> {$row['content']}</p>";
+									if ($row['no_player'] < 4) {
+										echo " <a href='javascript:;'><img id=jopic1 onclick=join(1) align=right src='images/join.png'  onmouseover=this.src='images/join2.png' onmouseout=this.src='images/join.png' style='visibility:visible;'></a>";
+									} else {
+										echo "<a href='javscript:;'><img id=jopic1 onclick=join(1) align=right src='images/join.png'  onmouseover=this.src=''images/join2.png'' onmouseout=this.src=''images/join.png'' style='visibility:hidden;'></a>";
+									}
+								?>                                   
                                 <p>&nbsp;</p></td>
                             </tr>
                             <tr>

@@ -1,6 +1,7 @@
 body {
 	background-color: #000000;
 	margin: auto;
+	min-width: 1024px;
 	background-image: url( '../images/background.jpg' );
 	background-repeat: no-repeat;
 	background-position: center top;
@@ -106,7 +107,7 @@ td.mainon{
 #bandtitle {
 	width: 90%;
 	max-width: 1200px;
-	height: 140px;
+	height: 110px;
 	background: rgba(100%,100%,100%,0.8);
 	margin: 10px;
 	margin-left: auto;
@@ -259,6 +260,7 @@ h2 {
 #footer {
 	position: relative;
 	width: 90%;
+	min-width: 921px;
 	max-width: 1200px;
 	background: rgba(100%,100%,100%,0.8);
 	margin: 4px;
@@ -322,6 +324,7 @@ h2 {
 	border-width: 0px;
 	border-spacing: 0px;
 }
+/*
 #chatroomBoxTopLeft {
 	cursor: nw-resize;
 }
@@ -334,6 +337,7 @@ h2 {
 #chatroomBoxLeft {
 	cursor: w-resize;
 }
+*/
 #chatroomContentTd {
 	vertical-align: bottom;
 }

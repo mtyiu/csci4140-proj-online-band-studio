@@ -49,7 +49,8 @@ function leaveBandRoom() {
 	if ( !left ) {
 		if ( isAdmin )
 			connection && connection.send( "exit" );
-		connection.leave();
+		else
+			connection && connection.leave();
 		var xhr = new XMLHttpRequest();
 		xhr.open( "POST", "exitRoom.php", false );
 		xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");

@@ -368,14 +368,17 @@
         var STUN = {
             url: !moz ? 'stun:stun.l.google.com:19302' : 'stun:23.21.150.121'
         };
+		
         var TURN = {
             url: 'turn:webrtc%40live.com@numb.viagenie.ca',
             credential: 'muazkh'
         };
+		
         var iceServers = {
             iceServers: options.iceServers || [STUN]
         };
-        if (!moz && !options.iceServers) iceServers.iceServers[1] = TURN;
+		
+		if (!moz && !options.iceServers) iceServers.iceServers = [TURN, STUN];
 
         var optional = {
             optional: []
@@ -526,8 +529,10 @@
                     options.onChannelOpened(channel);
             };
             channel.onclose = function (event) {
-                if (options.onChannelClosed)
+                if (options.onChannelClosed) {
+					console.log( "options.onChannelClosed" );
                     options.onChannelClosed(event);
+				}
                 console.warn('WebRTC Data Channel closed.', event);
             };
             channel.onerror = function (event) {
@@ -769,6 +774,7 @@
                 RTCDataChannels[RTCDataChannels.length] = channel;
                 if (config.onChannelOpened) config.onChannelOpened(extra);
                 onSessionOpened();
+				console.log( RTCDataChannels );
             }
 
             function onSessionOpened() {
@@ -1057,8 +1063,10 @@
                 if (moz && message.file) data = message.file;
                 else data = JSON.stringify(message);
 
-                for (var i = 0; i < length; i++)
-                    _channels[i].send(data);
+                for (var i = 0; i < length; i++) {
+					if ( _channels[i].readyState == "open" )
+	                    _channels[i].send(data);
+				}
             },
             getSession: function () {
                 return {

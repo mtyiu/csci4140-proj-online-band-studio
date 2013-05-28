@@ -37,9 +37,9 @@ function mouseout(e) {
 
 function showInfo(ev) {
 	var e = ev.id;
-	console.log("target:" + e);
-	console.log("s:" + ev);
-	console.log("per:" + per);
+//	console.log("target:" + e);
+//	console.log("s:" + ev);
+//	console.log("per:" + per);
 	if (per != e) {
 
 		Request.open("POST", "info.php", true);
@@ -57,7 +57,7 @@ function showInfo(ev) {
 
 					database = JSON.parse(Request.responseText);
 
-					console.log(database[e - 1].name);
+//					console.log(database[e - 1].name);
 					info(e);
 
 				}
@@ -79,6 +79,8 @@ function join(id) {
 			if (Request.status != 200)
 				alert("Error code = " + new String(Request.status));
 			else {
+				window.location.assign("bandroom.php");
+				/*
 				var ans = Request.responseText;
 
 				if (ans == "1") {
@@ -90,7 +92,9 @@ function join(id) {
 				if (ans == "3") {
 					window.location.assign("bandroom.php");
 				}
+				
 				console.log(ans);
+				*/
 			}
 		}
 	}
@@ -111,11 +115,11 @@ function info(e) {
 	}
 	join_pic.onclick = function () {
 		join(e);
-		console.log("ccc");
+//		console.log("ccc");
 	};
-	console.log(join_pic.onclick);
-	console.log(database[target].band_id);
-	console.log("Caa:" + pervious.onclick);
+//	console.log(join_pic.onclick);
+//	console.log(database[target].band_id);
+//	console.log("Caa:" + pervious.onclick);
 	pervious.className = "mainoff";
 	pervious.onmouseover = function () {
 		this.className = "mainon"
@@ -133,7 +137,7 @@ function info(e) {
 	desc.innerHTML = "<strong>Descritbtion:  </strong>" + database[target].content;
 
 	var tt = document.getElementById(e);
-	console.log("Caaw2:" + tt.id);
+//	console.log("Caaw2:" + tt.id);
 	tt.className = "mainon";
 	tt.onmouseover = function () {
 		this.className = "mainon"

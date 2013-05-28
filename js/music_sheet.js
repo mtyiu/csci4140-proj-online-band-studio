@@ -206,7 +206,7 @@ function prevPage() {
 
 function setMusicSheetLayer( e ) {
 	var height = document.body.clientHeight ? document.body.clientHeight : window.innerHeight;
-	height = height - 270;
+	height = height - 240;
 	musicSheetWrapperDiv.style.height = height;
 
 	if ( musicSheetImgElements != undefined ) {

@@ -65,7 +65,7 @@ function initAudio( currentSessionID ) {
 	promptlayer.appendChild( audioStreamTable );
 
 	connection = new RTCMultiConnection();
-	connection.autoCloseEntireSession = false;
+	connection.autoCloseEntireSession = true;
 	connection.session = 'audio and data';
 	connection.onmessage = messageMux;
 	connection.onclose = leaveBandRoom;

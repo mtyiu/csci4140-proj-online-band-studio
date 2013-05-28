@@ -52,9 +52,11 @@ function toggleChatRoom() {
 	chatroomButton.className = (chatroomBox.style.display == "none") ? "" : "shown";
 }
 
-function chatroomToggleAutoPopup() {
-	chatroomAutoPopup = !chatroomAutoPopup;
-	chatroomPopupCheckbox.checked = !chatroomPopupCheckbox.checked;
+function chatroomToggleAutoPopup( e ) {
+	e.stopPropagation();
+	if ( e.target !== chatroomPopupCheckbox )
+		chatroomPopupCheckbox.checked = !chatroomPopupCheckbox.checked;
+	chatroomAutoPopup = chatroomPopupCheckbox.checked;
 }
 
 function chatroomSendMessage( e ) {

@@ -136,7 +136,7 @@
 		<table id="footerTable">
 			<tr>
 			<td width="40"><b id="recordStartStop" class="startButton"></b></td>
-			<td width="15%"><p id="recordText" class="startRecordText">Record</p></td>
+			<td width="50"><p id="recordText" class="startRecordText">Record</p></td>
 			<td><p align="center" class="jslink" onclick="toggleAudioStreams();">View All Audio Streams</p></td>
 			<td id="mixer"><p class="jslink" onclick="showMixer();">Mixer</p></td>
 			<td id="musicsheetedit"><p class="jslink" onclick="setUploadForm();">Edit Music Sheet</p></td>

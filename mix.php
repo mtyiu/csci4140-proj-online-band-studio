@@ -59,6 +59,7 @@
 
 	$tmp_command = date( "Ymd-His" );
 	$output_file = sprintf( "%s/%d_%s_mix.wav", $OUTPUT_DIR, $id, $tmp_command );
+	$output_log = sprintf( "%s/%d_%s.log", $OUTPUT_DIR, $id, $tmp_command );
 	if ( $numChannels == 1 ) {
 		copy( $paths[0], $output_file );
 		echo "$output_file";
@@ -69,7 +70,6 @@
 		$tmp_command = sprintf( "-a:%d -i %s -ea:%d -epp:%d \\\n", ($i + 1), $paths[$i], $vols[$i], $pans[$i] );
 		$command = $command . $tmp_command;
 	}
-	$output_log = sprintf( "%s/%d_%s.log", $OUTPUT_DIR, $id, $tmp_command );
 	$tmp_command = "-a:all -o $output_file";
 	$command = "TERM=dumb " . $command . $tmp_command . " 2>&1";
 	exec( $command, $output );
