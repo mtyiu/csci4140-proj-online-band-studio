@@ -11,16 +11,16 @@ body {
 	overflow-y: scroll;
 }
 a:link {
-	color: #222;
+	color: #AAA;
 }
 a:visited {
-	color: #222;
+	color: #AAA;
 }
 a:active {
-	color: #AAA;
+	color: #FFF;
 }
 a:hover {
-	color: #AAA;
+	color: #FFF;
 }
 .jslink {
 	color: #222;
@@ -43,25 +43,25 @@ a:hover {
 #main_content {
 	width: 800px;
 	height: auto;
+	min-height: 100%;
+	overflow-y: auto;
 	margin: auto;
-	background-color: #000000;
+	background-color: rgba(0,0,0,0.9);
 }
 #right_section2 {
+	width: 800px;
+	margin: auto;
+	float: left;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	z-index: 2;
+	position: relative;
+}
+#section2 {
 	width: 800px;
 	height: auto;
 	margin: auto;
 	float: left;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	z-index: 2;
-	position: absolute;
-}
-#section2 {
-	width: 800px;
-	height: 600px;
-	margin: auto;
-	float: left;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	background-color: rgba(0,0,0,0.9);
 	z-index: 1;
 	position: absolute;
 }
@@ -80,13 +80,19 @@ a:hover {
 }
 td.mainoff {
 	background: url( '../images/main_menu_bg.gif' ) -130px 0px no-repeat;
-	height: 33px;
-	color: #FFFFFF;  
+	height: 37px;
+	text-align: center;
+	vertical-align: middle;
+	cursor: pointer;
+	color: #FFF;  
 }
 td.mainon{
 	background: url( '../images/main_menu_bg.gif' ) 0px 0px no-repeat;
-	height: 33px;
-	color: #FFFFFF;
+	height: 37px;
+	text-align: center;
+	vertical-align: middle;
+	cursor: pointer;
+	color: #FFF;
 }
 .box_top_line {
 	background: url( '../images/top_line.gif' ) left top repeat-x;

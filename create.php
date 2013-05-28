@@ -60,11 +60,9 @@
 			<div id="section2"></div>
 			<div id="right_section2">
 				<div class="title">
-					<p>Welcome
-						<?php
-							echo $login_session;
-						?>
-						<button onClick="logout()" value="Logout">Logout</button>
+					<p>
+						Welcome <font color="orange"><?php echo $login_session; ?></font>! 
+						<button onclick="logout()" value="Logout">Logout</button>
 					</p>
 				</div>
 				<div class="content">
