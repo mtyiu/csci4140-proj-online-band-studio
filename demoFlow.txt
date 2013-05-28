@@ -54,7 +54,7 @@ Venue:		SHB 904
 - In admin, set song information and mixer configuration (1 minute)
 	- Audio playback of local audio stream (1 minute)
 	- Audio playback of remote audio stream (1 minute) [10% (a)]
-- In players, upload music sheet. (2 minutes)
+- In players, upload music sheet (interval: 50000 ms). (2 minutes)
 - Start recording in admin
 	- Use Song #2 in admin, drums in player 1, piano in player 2, ? in player 3 (record 1 minute)
 	- Instant audio playback
