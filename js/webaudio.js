@@ -74,10 +74,12 @@ function initAudio( currentSessionID ) {
 			var mediaElement = stream.mediaElement;
 
 			if (stream.direction !== RTCDirection.OneWay) {
-				audioStreamTd[3].innerHTML = "";
+				if ( audioStreamTd[3].innerHTML == "<i>Loading...</i>" )
+					audioStreamTd[3].innerHTML = "";
 				audioStreamTd[3].appendChild( mediaElement );
 			} else {
-				audioStreamTd[1].innerHTML = "";
+				if ( audioStreamTd[1].innerHTML == "<i>Loading...</i>" )
+					audioStreamTd[1].innerHTML = "";
 				audioStreamTd[1].appendChild( mediaElement );
 			}
 			
@@ -86,7 +88,8 @@ function initAudio( currentSessionID ) {
 		
 		if (stream.type === 'local') {
 			mediaElement = stream.mediaElement;
-			audioStreamTd[1].innerHTML = "";
+			if ( audioStreamTd[1].innerHTML == "<i>Loading...</i>" )
+				audioStreamTd[1].innerHTML = "";
 			audioStreamTd[1].appendChild( mediaElement );
 			mediaElement.controls = true;
 			recorder = RecordRTC({
@@ -122,6 +125,7 @@ function messageMux( message ) {
 	switch( message ) {
 		case "start":
 			connection.send( 'ack' );
+			if ( isAdmin ) rmAllPreviousFiles();
 			startRecorder();
 			break;
 		case "end":
@@ -145,6 +149,22 @@ function messageMux( message ) {
 					chatroomReceiveMessage( message.substr( 5, message.length - 5 ) );
 			}
 	}
+}
+
+function rmAllPreviousFiles() {
+	if ( !isAdmin ) return;
+	var xhr = new XMLHttpRequest();
+	xhr.open( "GET", "rmAll.php", true );
+	xhr.send( null );
+	xhr.onreadystatechange = function() {
+		if ( xhr.readyState == 4 ) {
+			if ( xhr.status != 200 ) {
+				alert( "Error code = " + mixRequest.status );
+			} else {
+				alert( "Hihi" );
+			}
+		}
+	};
 }
 
 function openSession() {
@@ -366,7 +386,7 @@ function uploadWAV(url, blob) {
 					console.log( mixRequest.responseText );
 				}
 			}
-		}
+		};
 		if ( !isAdmin ) {
 			mixRequest.finished = false;
 			mixRequest.intervalEvent = window.setInterval(
