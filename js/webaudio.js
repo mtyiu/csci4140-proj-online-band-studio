@@ -155,6 +155,7 @@ function rmAllPreviousFiles() {
 	if ( !isAdmin ) return;
 	var xhr = new XMLHttpRequest();
 	xhr.open( "GET", "rmAll.php", true );
+	xhr.setRequestHeader( "If-Modified-Since", (new Date(0)).toGMTString() );
 	xhr.send( null );
 	xhr.onreadystatechange = function() {
 		if ( xhr.readyState == 4 ) {
