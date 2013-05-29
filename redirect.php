@@ -11,7 +11,11 @@
 		echo "1";
 	} else {
 		// Update band
-		$player = "player" . ($no_pp - 1);
+		for ( $i = 1; $i <= 3; $i++ ) {
+			$player = "player" . $i;
+			if ( $row[ $player ] == "" )
+				break;
+		}
 		$sql = "UPDATE `band` SET $player='$login_session' WHERE band_id='$id' ;";
 		$result = mysql_query( $sql ) or die( 'MySQL query error #2' );
 		$sql = "UPDATE `band` SET `no_player`='$no_pp' WHERE band_id='$id';";

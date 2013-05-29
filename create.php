@@ -79,6 +79,10 @@
 										break;
 									}
 								}
+								if ( $new_id == 0 ) {
+									echo "<script type=\"text/javascript\">alert('Sorry. No new room can be made...:-('); window.location.assign('welcome.php');</script>";
+									return;
+								}
 							?>
 							<tr>
 								<td width="200"><strong>ID:</strong>

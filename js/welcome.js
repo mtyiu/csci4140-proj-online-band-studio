@@ -31,6 +31,10 @@ function joinButtonHandler( e ) {
 }
 
 function join() {
+	if ( bandroomObj[ selectedBandroom - 1][3] == 4 ) {
+		alert( "Sorry. This room is full :-(" );
+		return;
+	}
 	var xhr = new XMLHttpRequest();
 	xhr.open( "POST", "redirect.php", false );
 	xhr.setRequestHeader( "Content-type", "application/x-www-form-urlencoded" );
